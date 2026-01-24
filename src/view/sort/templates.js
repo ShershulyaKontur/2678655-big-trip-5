@@ -1,5 +1,5 @@
-import { SORT_TYPE } from '../../data';
-import { capitalizeFirstLetter } from '../../utils';
+import { SORT_TYPE } from '../../const/const.js';
+import { capitalizeFirstLetter } from '../../utils/utils';
 
 function createSortItemTemplate(type){
   const label = capitalizeFirstLetter(type);

@@ -1,5 +1,5 @@
-import { DEST_COUNTRY, EVENT_TYPE, OFFERS } from '../../data.js';
-import { capitalizeFirstLetter } from '../../utils.js';
+import { DEST_COUNTRY, EVENT_TYPE, OFFERS } from '../../const/const.js';
+import { capitalizeFirstLetter } from '../../utils/utils.js';
 
 function createCountryOptionTemplate(country) {
   return `<option value="${country}"></option>`;

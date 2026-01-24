@@ -9,4 +9,4 @@ export const OFFERS = [
   { type: 'seats', title: 'Choose seats', price: 5 },
   { type: 'train', title: 'Travel by train', price: 40 }
 ];
-export const MAX_ITEM_COUNT = 3;
+export const MAX_EVENT_COUNT = 3;

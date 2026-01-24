@@ -1,5 +1,5 @@
-import { FILTERS_TYPE } from '../../data.js';
-import { capitalizeFirstLetter } from '../../utils.js';
+import { FILTERS_TYPE } from '../../const/const.js';
+import { capitalizeFirstLetter } from '../../utils/utils.js';
 
 function createFiltersItemTemplate(type){
   const label = capitalizeFirstLetter(type);
