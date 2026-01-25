@@ -11,11 +11,11 @@ export default class Model {
   }
 
   getDestById(id){
-    return this.destinations.find(el => el.id === id) || null;
+    return this.destinations.find((el) => el.id === id) || null;
   }
 
   getOfferByType(type){
-    return this.offers.find(el => el.type === type) || [];
+    return this.offers.find((el) => el.type === type) || [];
   }
 
 }

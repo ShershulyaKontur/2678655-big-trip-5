@@ -32,10 +32,10 @@ export default class Presenter {
     render(this.editForm, listElement);
 
 
-    this.model.points.forEach(point => {
+    this.model.points.forEach((point) => {
       const destination = this.model.getDestById(point.destination);
       const typeOffers = this.model.getOfferByType(point.type);
-      const offers = typeOffers.offers.filter(offer => point.offers.includes(offer.id)) || [];
+      const offers = typeOffers.offers.filter((offer) => point.offers.includes(offer.id)) || [];
       const eventItem = new EventItem(point, offers, destination);
       render(eventItem, listElement);
     });
