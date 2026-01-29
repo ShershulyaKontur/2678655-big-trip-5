@@ -1,6 +1,6 @@
 import { formatDate, getDuration } from '../../utils/formatter.js';
 
-export function createEventItemsTemplate(point, offers, destination){
+export function createEventItemsTemplate({point, offers, destination}){
   const { type, dateFrom, dateTo, basePrice, isFavorite } = point;
   const { name } = destination;
 
