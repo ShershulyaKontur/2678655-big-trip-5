@@ -4,6 +4,7 @@ import SortView from '../view/sort-view/sort-view.js';
 import EventListView from '../view/event-list-view/event-list-view.js';
 import EventItemView from '../view/event-item-view/event-item-view.js';
 import EditFormView from  '../view/form-view/edit-form-view.js';
+import { ESC_KEY } from '../const/const.js';
 
 export default class Presenter {
   #model = null;
@@ -28,18 +29,28 @@ export default class Presenter {
 
   #renderEvent(point) {
     const eventData = this.#prepareEventData(point);
+    const escKeyDownHandler = (evt) => {
+      if (evt.key === ESC_KEY) {
+        evt.preventDefault();
+        replaceFormToEvent();
+        document.removeEventListener('keydown', escKeyDownHandler);
+      }
+    };
     const editForm = new EditFormView({
         onSubmit: () => {
-          handleEditFormSubmit()
+          handleEditFormSubmit(),
+          document.addEventListener('keydown', escKeyDownHandler)
         },
         onClose:() => {
           replaceFormToEvent();
+          document.removeEventListener('keydown', escKeyDownHandler)
         }
       }
     );
     const eventItem = new EventItemView(eventData, {
       onClick: () => {
         replaceEventToForm();
+        document.addEventListener('keydown', escKeyDownHandler)
       }
     });
 
@@ -52,7 +63,7 @@ export default class Presenter {
     };
 
     function handleEditFormSubmit(){
-      alert('12');
+      alert('Все работает');
     };
 
     render(eventItem, this.#eventListComponent.element);
@@ -63,7 +74,6 @@ export default class Presenter {
       this.#renderEvent(point)
     );
   }
-
 
   init() {
     this.#filtersComponent = new FiltersView();

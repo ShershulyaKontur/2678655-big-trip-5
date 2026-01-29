@@ -10,3 +10,5 @@ export const OFFERS = [
   { type: 'seats', title: 'Choose seats', price: 5 },
   { type: 'train', title: 'Travel by train', price: 40 }
 ];
+
+export const ESC_KEY = 'Escape';
