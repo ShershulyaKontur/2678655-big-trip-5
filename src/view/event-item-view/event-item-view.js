@@ -18,5 +18,5 @@ export default class EventItemView extends AbstractView {
 
   #clickHandler = () => {
     this.#handleClick();
-  }
+  };
 }

@@ -3,7 +3,7 @@ import FiltersView from '../view/filters-view/filters-view.js';
 import SortView from '../view/sort-view/sort-view.js';
 import EventListView from '../view/event-list-view/event-list-view.js';
 import EventItemView from '../view/event-item-view/event-item-view.js';
-import EditFormView from  '../view/form-view/edit-form-view.js';
+import EditFormView from '../view/form-view/edit-form-view.js';
 import { ESC_KEY } from '../const/const.js';
 
 export default class Presenter {
@@ -14,7 +14,7 @@ export default class Presenter {
   #eventListComponent = null;
   #filtersComponent = null;
 
-  constructor({model, filtersContainer, eventsContainer}) {
+  constructor({ model, filtersContainer, eventsContainer }) {
     this.#model = model;
     this.#filtersContainer = filtersContainer;
     this.#eventsContainer = eventsContainer;
@@ -37,34 +37,29 @@ export default class Presenter {
       }
     };
     const editForm = new EditFormView({
-        onSubmit: () => {
-          handleEditFormSubmit(),
-          document.addEventListener('keydown', escKeyDownHandler)
-        },
-        onClose:() => {
-          replaceFormToEvent();
-          document.removeEventListener('keydown', escKeyDownHandler)
-        }
+      onSubmit: () => {
+        replaceFormToEvent();
+        document.removeEventListener('keydown', escKeyDownHandler);
+      },
+      onClose: () => {
+        replaceFormToEvent();
+        document.removeEventListener('keydown', escKeyDownHandler);
       }
-    );
+    });
     const eventItem = new EventItemView(eventData, {
       onClick: () => {
         replaceEventToForm();
-        document.addEventListener('keydown', escKeyDownHandler)
+        document.addEventListener('keydown', escKeyDownHandler);
       }
     });
 
-    function replaceFormToEvent(){
-      replace(eventItem, editForm)
-    };
+    function replaceFormToEvent() {
+      replace(eventItem, editForm);
+    }
 
-    function replaceEventToForm(){
-      replace(editForm, eventItem)
-    };
-
-    function handleEditFormSubmit(){
-      alert('Все работает');
-    };
+    function replaceEventToForm() {
+      replace(editForm, eventItem);
+    }
 
     render(eventItem, this.#eventListComponent.element);
   }

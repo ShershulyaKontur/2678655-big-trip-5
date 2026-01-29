@@ -20,10 +20,9 @@ export default class EditFormView extends AbstractView{
   #submitHandler = (evt) => {
     evt.preventDefault();
     this.#handleSubmit();
-    this.#handleClose();
-  }
+  };
 
   #closeHandler = () => {
     this.#handleClose();
-  }
+  };
 }
