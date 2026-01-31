@@ -20,45 +20,36 @@ export default class Presenter {
     this.#eventsContainer = eventsContainer;
   }
 
-  #prepareEventData(point) {
-    const destination = this.#model.getDestinationById(point.destination);
-    const typeOffers = this.#model.getOfferByType(point.type);
-    const offers = typeOffers.offers?.filter((offer) => point.offers.includes(offer.id)) || [];
-    return { point, offers, destination };
-  }
-
   #renderEvent(point) {
-    const eventData = this.#prepareEventData(point);
-    const escKeyDownHandler = (evt) => {
+    const eventData = this.#model.getEventDetails(point);
+
+    const editForm = new EditFormView({
+      onSubmit: () => handleFormSubmit(),
+      onClose: () => handleFormClose()
+    });
+
+    const eventItem = new EventItemView(eventData, {
+      onEdit: () => handleEditClick()
+    });
+
+    function escKeyDownHandler(evt){
       if (evt.key === ESC_KEY) {
         evt.preventDefault();
-        replaceFormToEvent();
+        replace(eventItem, editForm);
         document.removeEventListener('keydown', escKeyDownHandler);
       }
-    };
-    const editForm = new EditFormView({
-      onSubmit: () => {
-        replaceFormToEvent();
-        document.removeEventListener('keydown', escKeyDownHandler);
-      },
-      onClose: () => {
-        replaceFormToEvent();
-        document.removeEventListener('keydown', escKeyDownHandler);
-      }
-    });
-    const eventItem = new EventItemView(eventData, {
-      onClick: () => {
-        replaceEventToForm();
-        document.addEventListener('keydown', escKeyDownHandler);
-      }
-    });
-
-    function replaceFormToEvent() {
-      replace(eventItem, editForm);
     }
-
-    function replaceEventToForm() {
+    function handleFormSubmit(){
+      replace(eventItem, editForm);
+      document.removeEventListener('keydown', escKeyDownHandler);
+    }
+    function handleFormClose(){
+      replace(eventItem, editForm);
+      document.removeEventListener('keydown', escKeyDownHandler);
+    }
+    function handleEditClick(){
       replace(editForm, eventItem);
+      document.addEventListener('keydown', escKeyDownHandler);
     }
 
     render(eventItem, this.#eventListComponent.element);
@@ -69,6 +60,7 @@ export default class Presenter {
       this.#renderEvent(point)
     );
   }
+
 
   init() {
     this.#filtersComponent = new FiltersView();

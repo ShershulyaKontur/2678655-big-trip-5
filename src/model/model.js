@@ -15,11 +15,25 @@ export default class Model {
     return this.#points;
   }
 
-  getDestinationById(id) {
+  #getDestinationById(id) {
     return this.#destinations?.find((el) => el.id === id) ?? null;
   }
 
-  getOfferByType(type) {
-    return this.#offers?.find((el) => el.type === type) ?? [];
+  #getOfferByType(type) {
+    const group = this.#offers?.find((el) => el.type === type);
+    return group.offers ?? [];
+  }
+
+  #getOffersForPoint(point) {
+    const typeOffers = this.#getOfferByType(point.type);
+    return typeOffers.filter((offer) => point.offers.includes(offer.id));
+  }
+
+  getEventDetails(point) {
+    return {
+      point,
+      destination: this.#getDestinationById(point.destination),
+      offers: this.#getOffersForPoint(point)
+    };
   }
 }

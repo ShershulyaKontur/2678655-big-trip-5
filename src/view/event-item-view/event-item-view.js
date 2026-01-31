@@ -5,10 +5,10 @@ export default class EventItemView extends AbstractView {
   #data = null;
   #handleClick = null;
 
-  constructor(data, {onClick}) {
+  constructor(data, {onEdit}) {
     super();
     this.#data = data;
-    this.#handleClick = onClick;
+    this.#handleClick = onEdit;
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#clickHandler);
   }
 
