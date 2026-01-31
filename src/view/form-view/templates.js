@@ -4,17 +4,19 @@ import { capitalizeFirstLetter } from '../../utils/utils.js';
 function createCountryOptionTemplate(country) {
   return `<option value="${country}"></option>`;
 }
-function createEventTypeItemTemplate(type){
+
+function createEventTypeItemTemplate(type, index){
   const label = capitalizeFirstLetter(type);
   return `<div class="event__type-item">
-            <input id="event-type-${type}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}">
-            <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-1">${label}</label>
+            <input id="event-type-${type}-${index + 1}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}">
+            <label class="event__type-label  event__type-label--${type}" for="event-type-${type}-${index + 1}">${label}</label>
           </div>`;
 }
-function createOffersItemTemplate({type,title,price}){
+
+function createOffersItemTemplate({type,title,price}, index){
   return `<div class="event__offer-selector">
-            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${type}-1" type="checkbox" name="event-offer-${type}" checked>
-            <label class="event__offer-label" for="event-offer-${type}-1">
+            <input class="event__offer-checkbox  visually-hidden" id="event-offer-${type}-${index + 1}" type="checkbox" name="event-offer-${type}" checked>
+            <label class="event__offer-label" for="event-offer-${type}-${index + 1}">
               <span class="event__offer-title">${title}</span>
               &plus;&euro;&nbsp;
               <span class="event__offer-price">${price}</span>
@@ -34,7 +36,7 @@ export function createFormCreateTemplate(){
                 <div class="event__type-list">
                   <fieldset class="event__type-group">
                     <legend class="visually-hidden">Event type</legend>
-                    ${EVENT_TYPE.map((type) =>createEventTypeItemTemplate(type)).join('')}
+                    ${EVENT_TYPE.map((type,index) =>createEventTypeItemTemplate(type,index)).join('')}
                   </fieldset>
                 </div>
               </div>
@@ -72,7 +74,7 @@ export function createFormCreateTemplate(){
               <section class="event__section  event__section--offers">
                 <h3 class="event__section-title  event__section-title--offers">Offers</h3>
                 <div class="event__available-offers">
-                  ${OFFERS.map((offer) => createOffersItemTemplate(offer)).join('')}
+                  ${OFFERS.map((offer,index) => createOffersItemTemplate(offer,index)).join('')}
                 </div>
               </section>
 
