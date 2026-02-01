@@ -5,6 +5,7 @@ import EventListView from '../view/event-list-view/event-list-view.js';
 import EventItemView from '../view/event-item-view/event-item-view.js';
 import EditFormView from '../view/form-view/edit-form-view.js';
 import { ESC_KEY } from '../const/const.js';
+import EmptyList from '../view/list-empty-view/list-empty-view.js';
 
 export default class Presenter {
   #model = null;
@@ -13,6 +14,7 @@ export default class Presenter {
   #sortComponent = null;
   #eventListComponent = null;
   #filtersComponent = null;
+  #emptyListComponent = null;
 
   constructor({ model, filtersContainer, eventsContainer }) {
     this.#model = model;
@@ -56,20 +58,32 @@ export default class Presenter {
   }
 
   renderEvents() {
-    this.#model.points.forEach((point) =>
-      this.#renderEvent(point)
-    );
+    this.#model.points.forEach((point) => this.#renderEvent(point));
+  }
+
+  #renderEmptyList() {
+    this.#emptyListComponent = new EmptyList();
+    render(this.#emptyListComponent, this.#eventsContainer);
+  }
+
+  #renderContent() {
+    this.#sortComponent = new SortView();
+    this.#eventListComponent = new EventListView();
+
+    render(this.#sortComponent, this.#eventsContainer);
+    render(this.#eventListComponent, this.#eventsContainer);
+    this.renderEvents();
   }
 
 
   init() {
     this.#filtersComponent = new FiltersView();
-    this.#sortComponent = new SortView();
-    this.#eventListComponent = new EventListView();
-
     render(this.#filtersComponent, this.#filtersContainer);
-    render(this.#sortComponent, this.#eventsContainer);
-    render(this.#eventListComponent, this.#eventsContainer);
-    this.renderEvents();
+
+    if (this.#model.isEmpty()) {
+      this.#renderEmptyList();
+    } else {
+      this.#renderContent();
+    }
   }
 }
