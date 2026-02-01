@@ -1,6 +1,6 @@
 import { mockOffers } from './offers.js';
 import { mockDestinations } from './destinations.js';
-import { mockEvents } from './point.js';
+import { mockEvents } from './points.js';
 
 export const getOffers = () => [...mockOffers];
 export const getDestinations = () => [...mockDestinations];
