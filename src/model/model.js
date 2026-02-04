@@ -29,6 +29,10 @@ export default class Model {
     return typeOffers.filter((offer) => point.offers.includes(offer.id));
   }
 
+  isEmpty() {
+    return this.points.length === 0;
+  }
+
   getEventDetails(point) {
     return {
       point,

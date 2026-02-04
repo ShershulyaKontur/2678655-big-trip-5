@@ -1,22 +1,20 @@
 import { render, replace } from '../framework/render.js';
-import FiltersView from '../view/filters-view/filters-view.js';
 import SortView from '../view/sort-view/sort-view.js';
 import EventListView from '../view/event-list-view/event-list-view.js';
 import EventItemView from '../view/event-item-view/event-item-view.js';
 import EditFormView from '../view/form-view/edit-form-view.js';
-import { ESC_KEY } from '../const/const.js';
+import { ESC_KEY } from '../constants/const.js';
+import EmptyList from '../view/list-empty-view/list-empty-view.js';
 
-export default class Presenter {
+export default class EventPresenter {
   #model = null;
-  #filtersContainer = null;
   #eventsContainer = null;
   #sortComponent = null;
   #eventListComponent = null;
-  #filtersComponent = null;
+  #emptyListComponent = null;
 
-  constructor({ model, filtersContainer, eventsContainer }) {
+  constructor({ model, eventsContainer }) {
     this.#model = model;
-    this.#filtersContainer = filtersContainer;
     this.#eventsContainer = eventsContainer;
   }
 
@@ -55,21 +53,29 @@ export default class Presenter {
     render(eventItem, this.#eventListComponent.element);
   }
 
-  renderEvents() {
-    this.#model.points.forEach((point) =>
-      this.#renderEvent(point)
-    );
+  #renderEmptyList() {
+    this.#emptyListComponent = new EmptyList();
+    render(this.#emptyListComponent, this.#eventsContainer);
   }
 
-
-  init() {
-    this.#filtersComponent = new FiltersView();
+  #renderContent() {
     this.#sortComponent = new SortView();
     this.#eventListComponent = new EventListView();
 
-    render(this.#filtersComponent, this.#filtersContainer);
     render(this.#sortComponent, this.#eventsContainer);
     render(this.#eventListComponent, this.#eventsContainer);
     this.renderEvents();
+  }
+
+  renderEvents() {
+    this.#model.points.forEach((point) => this.#renderEvent(point));
+  }
+
+  init() {
+    if (this.#model.isEmpty()) {
+      this.#renderEmptyList();
+    } else {
+      this.#renderContent();
+    }
   }
 }

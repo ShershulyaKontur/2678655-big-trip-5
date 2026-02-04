@@ -28,5 +28,15 @@ export const mockEvents = [
     isFavorite: false,
     offers: [1, 4],
     type: 'train'
+  },
+  {
+    id: 4,
+    basePrice: 1500,
+    dateFrom:  'December 25, 2025 10:24:00',
+    dateTo: 'December 26, 2025 10:34:00',
+    destination: 3,
+    isFavorite: false,
+    offers: [1, 4],
+    type: 'flight'
   }
 ];

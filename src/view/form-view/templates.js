@@ -1,4 +1,4 @@
-import { DEST_COUNTRY, EVENT_TYPE, OFFERS } from '../../const/const.js';
+import { DEST_COUNTRY, EVENT_TYPE, OFFERS } from '../../constants/mock-const.js';
 import { capitalizeFirstLetter } from '../../utils/utils.js';
 
 function createCountryOptionTemplate(country) {

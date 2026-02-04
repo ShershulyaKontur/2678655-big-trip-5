@@ -1,4 +1,4 @@
-import { SORT_TYPE } from '../../const/const';
+import { SORT_TYPE } from '../../constants/mock-const';
 import { capitalizeFirstLetter } from '../../utils/utils';
 
 function createSortItemTemplate(type){
