@@ -15,12 +15,20 @@ export default class Model {
     return this.#points;
   }
 
+  get offers() {
+    return this.#offers;
+  }
+
+  get destinations() {
+    return this.#destinations;
+  }
+
   #getDestinationById(id) {
-    return this.#destinations?.find((el) => el.id === id) ?? null;
+    return this.destinations?.find((el) => el.id === id) ?? null;
   }
 
   #getOfferByType(type) {
-    const group = this.#offers?.find((el) => el.type === type);
+    const group = this.offers?.find((el) => el.type === type);
     return group.offers ?? [];
   }
 
