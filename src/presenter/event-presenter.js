@@ -44,9 +44,7 @@ export default class PointPresenter {
 
     if(this.#modeView === MODE.DEFAULT){
       replace(this.#eventComponent, prevEventComponent);
-    }
-
-    if(this.#modeView === MODE.EDITING){
+    }else{
       replace(this.#eventEditForm, prevEventEditForm);
     }
 
