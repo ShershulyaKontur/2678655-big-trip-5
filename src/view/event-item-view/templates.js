@@ -1,7 +1,6 @@
 import { formatDate, getDuration } from '../../utils/formatter.js';
 
-export function createEventItemsTemplate({point, offers, destination}){
-  const { type, dateFrom, dateTo, basePrice, isFavorite } = point;
+export function createEventItemsTemplate({type, dateFrom, dateTo, basePrice, isFavorite, offers, destination}){
   const { name } = destination;
 
   return `<li class="trip-events__item">

@@ -42,10 +42,13 @@ export default class Model {
   }
 
   getEventDetails(point) {
+    const destination = this.#getDestinationById(point.destination);
+    const offers = this.#getOffersForPoint(point);
+
     return {
-      point,
-      destination: this.#getDestinationById(point.destination),
-      offers: this.#getOffersForPoint(point)
+      ...point,
+      offers,
+      destination
     };
   }
 }
