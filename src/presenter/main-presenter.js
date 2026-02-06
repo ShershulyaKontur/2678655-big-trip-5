@@ -13,7 +13,7 @@ export default class MainPresenter {
   #sortComponent = new SortView();
   #emptyListComponent = new EmptyList();
   #eventListComponent = new EventListView();
-  #eventsPresenter = new Map();
+  #eventPresenters = new Map();
 
   constructor({ model, eventsContainer }) {
     this.#model = model;
@@ -25,19 +25,24 @@ export default class MainPresenter {
     this.#renderList();
   }
 
-  #handleEventChange = (updateEvent) => {
-    this.#points = updateItem(this.#points, updateEvent);
-    this.#eventsPresenter.get(updateEvent.id).init(updateEvent);
+  #handleModeViewChange = () => {
+    this.#eventPresenters.forEach((presenter) => presenter.resetView());
   };
 
-  #renderPoint(point) {
+  #handleEventChange = (updateEvent) => {
+    this.#points = updateItem(this.#points, updateEvent);
+    this.#eventPresenters.get(updateEvent.id).init(updateEvent);
+  };
+
+  #renderEvent(point) {
     const eventDetails = this.#model.getEventDetails(point);
     const eventPresenter = new EventPresenter({
       eventListComponent: this.#eventListComponent.element,
-      onDataChange: this.#handleEventChange
+      onDataChange: this.#handleEventChange,
+      onModeViewChange: this.#handleModeViewChange
     });
     eventPresenter.init(eventDetails);
-    this.#eventsPresenter.set(point.id, eventPresenter);
+    this.#eventPresenters.set(point.id, eventPresenter);
   }
 
   #renderEmptyList() {
@@ -45,7 +50,7 @@ export default class MainPresenter {
   }
 
   #renderEvents() {
-    this.#points.forEach((point) => this.#renderPoint(point));
+    this.#points.forEach((point) => this.#renderEvent(point));
   }
 
   #renderList(){
