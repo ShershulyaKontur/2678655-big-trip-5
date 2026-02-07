@@ -1,81 +1,100 @@
-import { render, replace } from '../framework/render.js';
-import SortView from '../view/sort-view/sort-view.js';
-import EventListView from '../view/event-list-view/event-list-view.js';
+import { render, replace, remove } from '../framework/render.js';
 import EventItemView from '../view/event-item-view/event-item-view.js';
 import EditFormView from '../view/form-view/edit-form-view.js';
-import { ESC_KEY } from '../constants/const.js';
-import EmptyList from '../view/list-empty-view/list-empty-view.js';
+import { ESC_KEY, Mode } from '../constants/const.js';
 
 export default class EventPresenter {
-  #model = null;
-  #eventsContainer = null;
-  #sortComponent = null;
+  #eventEditForm = null;
+  #eventComponent = null;
   #eventListComponent = null;
-  #emptyListComponent = null;
 
-  constructor({ model, eventsContainer }) {
-    this.#model = model;
-    this.#eventsContainer = eventsContainer;
+  #handleEventChange = null;
+  #handleModeViewChange = null;
+
+  #eventData = null;
+  #modeView = Mode.DEFAULT;
+
+  constructor({ eventListComponent, onDataChange, onModeViewChange }) {
+    this.#eventListComponent = eventListComponent;
+    this.#handleEventChange = onDataChange;
+    this.#handleModeViewChange = onModeViewChange;
   }
 
-  #renderEvent(point) {
-    const eventData = this.#model.getEventDetails(point);
+  init(eventData) {
+    this.#eventData = eventData;
 
-    const editForm = new EditFormView({
-      onSubmit: () => handleFormSubmit(),
-      onClose: () => handleFormClose()
+    const prevEventComponent = this.#eventComponent;
+    const prevEventEditForm = this.#eventEditForm;
+
+    this.#eventEditForm = new EditFormView({
+      onSubmit: () => this.#handleFormSubmit(),
+      onClose: () => this.#handleFormClose()
     });
 
-    const eventItem = new EventItemView(eventData, {
-      onEdit: () => handleEditClick()
+    this.#eventComponent = new EventItemView({
+      eventData,
+      onFavorite: () => this.#handleFavoriteClick(),
+      onEdit: () => this.#handleEditClick()
     });
 
-    function escKeyDownHandler(evt){
-      if (evt.key === ESC_KEY) {
-        evt.preventDefault();
-        replace(eventItem, editForm);
-        document.removeEventListener('keydown', escKeyDownHandler);
-      }
-    }
-    function handleFormSubmit(){
-      replace(eventItem, editForm);
-      document.removeEventListener('keydown', escKeyDownHandler);
-    }
-    function handleFormClose(){
-      replace(eventItem, editForm);
-      document.removeEventListener('keydown', escKeyDownHandler);
-    }
-    function handleEditClick(){
-      replace(editForm, eventItem);
-      document.addEventListener('keydown', escKeyDownHandler);
+    if (prevEventComponent === null || prevEventEditForm === null) {
+      render(this.#eventComponent, this.#eventListComponent);
+      return;
     }
 
-    render(eventItem, this.#eventListComponent.element);
+    if (this.#modeView === Mode.DEFAULT) {
+      replace(this.#eventComponent, prevEventComponent);
+    } else{
+      replace(this.#eventEditForm, prevEventEditForm);
+    }
+
+    remove(prevEventComponent);
+    remove(prevEventEditForm);
   }
 
-  #renderEmptyList() {
-    this.#emptyListComponent = new EmptyList();
-    render(this.#emptyListComponent, this.#eventsContainer);
-  }
 
-  #renderContent() {
-    this.#sortComponent = new SortView();
-    this.#eventListComponent = new EventListView();
-
-    render(this.#sortComponent, this.#eventsContainer);
-    render(this.#eventListComponent, this.#eventsContainer);
-    this.renderEvents();
-  }
-
-  renderEvents() {
-    this.#model.points.forEach((point) => this.#renderEvent(point));
-  }
-
-  init() {
-    if (this.#model.isEmpty()) {
-      this.#renderEmptyList();
-    } else {
-      this.#renderContent();
+  resetView() {
+    if (this.#modeView !== Mode.DEFAULT) {
+      this.#replaceFormToEvent();
     }
+  }
+
+  #handleFavoriteClick() {
+    this.#handleEventChange({
+      ...this.#eventData,
+      isFavorite: !this.#eventData.isFavorite
+    });
+  }
+
+  #replaceEventToForm() {
+    replace(this.#eventEditForm, this.#eventComponent);
+    document.addEventListener('keydown', this.#escKeyDownHandler);
+    this.#handleModeViewChange();
+    this.#modeView = Mode.EDITING;
+  }
+
+  #replaceFormToEvent() {
+    replace(this.#eventComponent, this.#eventEditForm);
+    document.removeEventListener('keydown', this.#escKeyDownHandler);
+    this.#modeView = Mode.DEFAULT;
+  }
+
+  #escKeyDownHandler = (evt) => {
+    if (evt.key === ESC_KEY) {
+      evt.preventDefault();
+      this.#replaceFormToEvent();
+    }
+  };
+
+  #handleFormSubmit() {
+    this.#replaceFormToEvent();
+  }
+
+  #handleFormClose() {
+    this.#replaceFormToEvent();
+  }
+
+  #handleEditClick() {
+    this.#replaceEventToForm();
   }
 }

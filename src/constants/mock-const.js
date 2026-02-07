@@ -1,8 +1,7 @@
 export const SORT_TYPE = ['day', 'event', 'time', 'price', 'offer'];
-export const FILTERS_TYPE = ['everything', 'future', 'present', 'past'];
 export const EVENT_TYPE = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing' , 'restaurant'];
 export const DEST_COUNTRY = ['Amsterdam', 'Geneva', 'Chamonix'];
-export const OFFERS = [
+export const Offers = [
   { type: 'luggage', title: 'Add luggage', price: 30 },
   { type: 'comfort', title: 'Switch to comfort class', price: 100 },
   { type: 'meal', title: 'Add meal', price: 15 },

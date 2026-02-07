@@ -1,6 +1,6 @@
 import dayjs from 'dayjs';
 
-export const isFuturePoint = (point) => dayjs().isBefore(point.dateFrom, 'minute');
-export const isPresentPoint = (point) => dayjs().isAfter(point.dateFrom, 'minute') && dayjs().isBefore(point.dateTo, 'minute');
-export const isPastPoint = (point) => dayjs().isAfter(point.dateTo, 'minute');
+export const isFutureEvent = (event) => dayjs().isBefore(event.dateFrom, 'minute');
+export const isPresentEvent = (event) => dayjs().isAfter(event.dateFrom, 'minute') && dayjs().isBefore(event.dateTo, 'minute');
+export const isPastEvent = (event) => dayjs().isAfter(event.dateTo, 'minute');
 

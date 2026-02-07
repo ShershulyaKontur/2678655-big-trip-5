@@ -1,43 +1,54 @@
-import { getDestinations, getOffers, getPoints } from '../mock/mock-utils.js';
+import { getDestinations, getOffers, getEvents } from '../mock/mock-utils.js';
 
 export default class Model {
-  #points = null;
+  #events = null;
   #offers = null;
   #destinations = null;
 
   constructor() {
-    this.#points = getPoints();
+    this.#events = getEvents();
     this.#offers = getOffers();
     this.#destinations = getDestinations();
   }
 
-  get points() {
-    return this.#points;
+  get events() {
+    return this.#events;
+  }
+
+  get offers() {
+    return this.#offers;
+  }
+
+  get destinations() {
+    return this.#destinations;
   }
 
   #getDestinationById(id) {
-    return this.#destinations?.find((el) => el.id === id) ?? null;
+    return this.destinations?.find((el) => el.id === id) ?? null;
   }
 
   #getOfferByType(type) {
-    const group = this.#offers?.find((el) => el.type === type);
+    const group = this.offers?.find((el) => el.type === type);
     return group.offers ?? [];
   }
 
-  #getOffersForPoint(point) {
-    const typeOffers = this.#getOfferByType(point.type);
-    return typeOffers.filter((offer) => point.offers.includes(offer.id));
+  #getOffersForPoint(event) {
+    const typeOffers = this.#getOfferByType(event.type);
+    return typeOffers.filter((offer) => event.offers.includes(offer.id));
   }
 
   isEmpty() {
-    return this.points.length === 0;
+    return this.events.length === 0;
   }
 
-  getEventDetails(point) {
+  getEventDetails(event) {
+    const destination = this.#getDestinationById(event.destination);
+    const offers = this.#getOffersForPoint(event);
+
     return {
-      point,
-      destination: this.#getDestinationById(point.destination),
-      offers: this.#getOffersForPoint(point)
+      ...event,
+      offers,
+      destination
     };
   }
 }

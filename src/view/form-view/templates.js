@@ -1,4 +1,4 @@
-import { DEST_COUNTRY, EVENT_TYPE, OFFERS } from '../../constants/mock-const.js';
+import { DEST_COUNTRY, EVENT_TYPE, Offers } from '../../constants/mock-const.js';
 import { capitalizeFirstLetter } from '../../utils/utils.js';
 
 function createCountryOptionTemplate(country) {
@@ -74,7 +74,7 @@ export function createFormCreateTemplate(){
               <section class="event__section  event__section--offers">
                 <h3 class="event__section-title  event__section-title--offers">Offers</h3>
                 <div class="event__available-offers">
-                  ${OFFERS.map((offer,index) => createOffersItemTemplate(offer,index)).join('')}
+                  ${Offers.map((offer,index) => createOffersItemTemplate(offer,index)).join('')}
                 </div>
               </section>
 
@@ -150,7 +150,7 @@ export function createFormEditTemplate(){
                 <h3 class="event__section-title  event__section-title--offers">Offers</h3>
 
                 <div class="event__available-offers">
-                  ${OFFERS.map((offer) => createOffersItemTemplate(offer)).join('')}
+                  ${Offers.map((offer) => createOffersItemTemplate(offer)).join('')}
                 </div>
               </section>
 

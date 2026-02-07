@@ -1,8 +1,8 @@
-import { filter } from '../constants/filter-const';
+import { Filter } from '../constants/filter-const';
 
-export const generateFilters = (points) =>
-  Object.entries(filter).map(([type, fn]) => ({
+export const generateFilters = (events) =>
+  Object.entries(Filter).map(([type, fn]) => ({
     type,
-    count: fn(points).length
+    count: fn(events).length
   }));
 
