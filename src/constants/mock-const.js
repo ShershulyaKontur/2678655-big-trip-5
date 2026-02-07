@@ -1,4 +1,3 @@
-export const SORT_TYPE = ['day', 'event', 'time', 'price', 'offer'];
 export const EVENT_TYPE = ['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing' , 'restaurant'];
 export const DEST_COUNTRY = ['Amsterdam', 'Geneva', 'Chamonix'];
 export const OFFERS = [
@@ -8,3 +7,11 @@ export const OFFERS = [
   { type: 'seats', title: 'Choose seats', price: 5 },
   { type: 'train', title: 'Travel by train', price: 40 }
 ];
+export const SORT_TYPE = {
+  DEFAULT: 'day',
+  EVENT: 'event',
+  TIME: 'time',
+  PRICE: 'price',
+  OFFER: 'offer'
+};
+
