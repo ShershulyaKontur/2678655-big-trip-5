@@ -3,7 +3,7 @@ import EventItemView from '../view/event-item-view/event-item-view.js';
 import EditFormView from '../view/form-view/edit-form-view.js';
 import { ESC_KEY, MODE } from '../constants/const.js';
 
-export default class PointPresenter {
+export default class EventPresenter {
   #eventEditForm = null;
   #eventComponent = null;
   #eventListComponent = null;
@@ -11,7 +11,7 @@ export default class PointPresenter {
   #handleEventChange = null;
   #handleModeViewChange = null;
 
-  #pointData = null;
+  #eventData = null;
   #modeView = MODE.DEFAULT;
 
   constructor({ eventListComponent, onDataChange, onModeViewChange }) {
@@ -20,8 +20,8 @@ export default class PointPresenter {
     this.#handleModeViewChange = onModeViewChange;
   }
 
-  init(pointData) {
-    this.#pointData = pointData;
+  init(eventData) {
+    this.#eventData = eventData;
 
     const prevEventComponent = this.#eventComponent;
     const prevEventEditForm = this.#eventEditForm;
@@ -32,7 +32,7 @@ export default class PointPresenter {
     });
 
     this.#eventComponent = new EventItemView({
-      pointData,
+      eventData,
       onFavorite: () => this.#handleFavoriteClick(),
       onEdit: () => this.#handleEditClick()
     });
@@ -61,8 +61,8 @@ export default class PointPresenter {
 
   #handleFavoriteClick(){
     this.#handleEventChange({
-      ...this.#pointData,
-      isFavorite: !this.#pointData.isFavorite
+      ...this.#eventData,
+      isFavorite: !this.#eventData.isFavorite
     });
   }
 

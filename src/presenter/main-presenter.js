@@ -9,7 +9,7 @@ export default class MainPresenter {
   #model = null;
   #eventsContainer = null;
 
-  #points = [];
+  #events = [];
   #sortComponent = new SortView();
   #emptyListComponent = new EmptyList();
   #eventListComponent = new EventListView();
@@ -21,7 +21,7 @@ export default class MainPresenter {
   }
 
   init() {
-    this.#points = [...this.#model.points];
+    this.#events = [...this.#model.events];
     this.#renderList();
   }
 
@@ -30,19 +30,19 @@ export default class MainPresenter {
   };
 
   #handleEventChange = (updateEvent) => {
-    this.#points = updateItem(this.#points, updateEvent);
+    this.#events = updateItem(this.#events, updateEvent);
     this.#eventPresenters.get(updateEvent.id).init(updateEvent);
   };
 
-  #renderEvent(point) {
-    const eventDetails = this.#model.getEventDetails(point);
+  #renderEvent(event) {
+    const eventDetails = this.#model.getEventDetails(event);
     const eventPresenter = new EventPresenter({
       eventListComponent: this.#eventListComponent.element,
       onDataChange: this.#handleEventChange,
       onModeViewChange: this.#handleModeViewChange
     });
     eventPresenter.init(eventDetails);
-    this.#eventPresenters.set(point.id, eventPresenter);
+    this.#eventPresenters.set(event.id, eventPresenter);
   }
 
   #renderEmptyList() {
@@ -50,7 +50,7 @@ export default class MainPresenter {
   }
 
   #renderEvents() {
-    this.#points.forEach((point) => this.#renderEvent(point));
+    this.#events.forEach((event) => this.#renderEvent(event));
   }
 
   #renderList(){

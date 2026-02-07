@@ -1,4 +1,4 @@
-export const mockPoints = [
+export const mockEvents = [
   {
     id: 1,
     basePrice: 20,

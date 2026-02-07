@@ -2,13 +2,13 @@ import { createEventItemsTemplate } from './templates.js';
 import AbstractView from '../../framework/view/abstract-view.js';
 
 export default class EventItemView extends AbstractView {
-  #pointData = null;
+  #eventData = null;
   #handleEditClick = null;
   #handleFavoriteClick = null;
 
-  constructor({pointData, onEdit, onFavorite}) {
+  constructor({eventData, onEdit, onFavorite}) {
     super();
-    this.#pointData = pointData;
+    this.#eventData = eventData;
     this.#handleEditClick = onEdit;
     this.#handleFavoriteClick = onFavorite;
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#editClickHandler);
@@ -16,7 +16,7 @@ export default class EventItemView extends AbstractView {
   }
 
   get template() {
-    return createEventItemsTemplate(this.#pointData);
+    return createEventItemsTemplate(this.#eventData);
   }
 
   #editClickHandler = () => {
