@@ -1,9 +1,9 @@
 import { render, replace, remove } from '../framework/render.js';
 import EventItemView from '../view/event-item-view/event-item-view.js';
 import EditFormView from '../view/form-view/edit-form-view.js';
-import { ESC_KEY, MODE } from '../constants/const.js';
+import { ESC_KEY, Mode } from '../constants/const.js';
 
-export default class PointPresenter {
+export default class EventPresenter {
   #eventEditForm = null;
   #eventComponent = null;
   #eventListComponent = null;
@@ -11,8 +11,8 @@ export default class PointPresenter {
   #handleEventChange = null;
   #handleModeViewChange = null;
 
-  #pointData = null;
-  #modeView = MODE.DEFAULT;
+  #eventData = null;
+  #modeView = Mode.DEFAULT;
 
   constructor({ eventListComponent, onDataChange, onModeViewChange }) {
     this.#eventListComponent = eventListComponent;
@@ -20,8 +20,8 @@ export default class PointPresenter {
     this.#handleModeViewChange = onModeViewChange;
   }
 
-  init(pointData) {
-    this.#pointData = pointData;
+  init(eventData) {
+    this.#eventData = eventData;
 
     const prevEventComponent = this.#eventComponent;
     const prevEventEditForm = this.#eventEditForm;
@@ -32,19 +32,19 @@ export default class PointPresenter {
     });
 
     this.#eventComponent = new EventItemView({
-      pointData,
+      eventData,
       onFavorite: () => this.#handleFavoriteClick(),
       onEdit: () => this.#handleEditClick()
     });
 
-    if(prevEventComponent === null || prevEventEditForm === null){
+    if (prevEventComponent === null || prevEventEditForm === null) {
       render(this.#eventComponent, this.#eventListComponent);
       return;
     }
 
-    if(this.#modeView === MODE.DEFAULT){
+    if (this.#modeView === Mode.DEFAULT) {
       replace(this.#eventComponent, prevEventComponent);
-    }else{
+    } else{
       replace(this.#eventEditForm, prevEventEditForm);
     }
 
@@ -53,30 +53,30 @@ export default class PointPresenter {
   }
 
 
-  resetView(){
-    if(this.#modeView !== MODE.DEFAULT){
+  resetView() {
+    if (this.#modeView !== Mode.DEFAULT) {
       this.#replaceFormToEvent();
     }
   }
 
-  #handleFavoriteClick(){
+  #handleFavoriteClick() {
     this.#handleEventChange({
-      ...this.#pointData,
-      isFavorite: !this.#pointData.isFavorite
+      ...this.#eventData,
+      isFavorite: !this.#eventData.isFavorite
     });
   }
 
-  #replaceEventToForm(){
+  #replaceEventToForm() {
     replace(this.#eventEditForm, this.#eventComponent);
     document.addEventListener('keydown', this.#escKeyDownHandler);
     this.#handleModeViewChange();
-    this.#modeView = MODE.EDITING;
+    this.#modeView = Mode.EDITING;
   }
 
-  #replaceFormToEvent(){
+  #replaceFormToEvent() {
     replace(this.#eventComponent, this.#eventEditForm);
     document.removeEventListener('keydown', this.#escKeyDownHandler);
-    this.#modeView = MODE.DEFAULT;
+    this.#modeView = Mode.DEFAULT;
   }
 
   #escKeyDownHandler = (evt) => {
@@ -86,15 +86,15 @@ export default class PointPresenter {
     }
   };
 
-  #handleFormSubmit(){
+  #handleFormSubmit() {
     this.#replaceFormToEvent();
   }
 
-  #handleFormClose(){
+  #handleFormClose() {
     this.#replaceFormToEvent();
   }
 
-  #handleEditClick(){
+  #handleEditClick() {
     this.#replaceEventToForm();
   }
 }

@@ -1,4 +1,4 @@
-import { isFuturePoint, isPastPoint, isPresentPoint } from '../utils/filters-utils';
+import { isFutureEvent, isPastEvent, isPresentEvent } from '../utils/filters-utils';
 
 export const FilterType = {
   EVERYTHING: 'everything',
@@ -7,9 +7,9 @@ export const FilterType = {
   PAST: 'past'
 };
 
-export const FILTER = {
-  [FilterType.EVERYTHING]: (points) => points.slice(),
-  [FilterType.FUTURE]: (points) => points.filter((point) => isFuturePoint(point)),
-  [FilterType.PRESENT]: (points) => points.filter((point) => isPresentPoint(point)),
-  [FilterType.PAST]: (points) => points.filter((point) => isPastPoint(point))
+export const Filter = {
+  [FilterType.EVERYTHING]: (events) => events.slice(),
+  [FilterType.FUTURE]: (events) => events.filter((event) => isFutureEvent(event)),
+  [FilterType.PRESENT]: (events) => events.filter((event) => isPresentEvent(event)),
+  [FilterType.PAST]: (events) => events.filter((event) => isPastEvent(event))
 };
