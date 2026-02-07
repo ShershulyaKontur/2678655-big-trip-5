@@ -61,15 +61,15 @@ export default class MainPresenter {
     }
   }
 
-  #renderSort(){
+  #renderSort() {
     render(this.#sortComponent, this.#eventsContainer);
   }
 
-  #renderListComponent(){
+  #renderListComponent() {
     render(this.#eventListComponent, this.#eventsContainer);
   }
 
-  #renderContent(){
+  #renderContent() {
     this.#renderSort();
     this.#renderListComponent();
     this.#renderEvents();

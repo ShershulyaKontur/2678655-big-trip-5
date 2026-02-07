@@ -7,7 +7,7 @@ export const FilterType = {
   PAST: 'past'
 };
 
-export const FILTER = {
+export const Filter = {
   [FilterType.EVERYTHING]: (events) => events.slice(),
   [FilterType.FUTURE]: (events) => events.filter((event) => isFutureEvent(event)),
   [FilterType.PRESENT]: (events) => events.filter((event) => isPresentEvent(event)),
