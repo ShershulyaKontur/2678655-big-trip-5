@@ -11,7 +11,6 @@ export default class MainPresenter {
   #model = null;
   #eventsContainer = null;
   #sortComponent = null;
-  #sourcedPoints = [];
   #events = [];
 
   #emptyListComponent = new EmptyList();
@@ -28,8 +27,6 @@ export default class MainPresenter {
     this.#events = [...this.#model.events
       .map((event) => this.#model.getEventDetails(event))];
     this.#events.sort(SortFns[this.#currentSortType]);
-    this.#sourcedPoints = [...this.#events];
-
     this.#renderList();
   }
 
@@ -99,7 +96,6 @@ export default class MainPresenter {
 
   #handleEventChange = (updateEvent) => {
     this.#events = updateItem(this.#events, updateEvent);
-    this.#sourcedPoints = updateItem(this.#sourcedPoints, updateEvent);
     this.#eventPresenters.get(updateEvent.id).init(updateEvent);
   };
 
@@ -116,6 +112,6 @@ export default class MainPresenter {
   };
 
   #sortTasks(sortType) {
-    this.#events = [...this.#sourcedPoints].sort(SortFns[sortType]);
+    this.#events = [...this.#events].sort(SortFns[sortType]);
   }
 }
