@@ -1,21 +1,22 @@
-import { render } from '../framework/render.js';
+import { render, replace } from '../framework/render.js';
+import { updateItem } from '../utils/utils.js';
+import { SortType } from '../constants/sort-const.js';
+import { SortFns } from '../constants/sort-const.js';
 import SortView from '../view/sort-view/sort-view.js';
 import EventListView from '../view/event-list-view/event-list-view.js';
 import EmptyList from '../view/list-empty-view/list-empty-view.js';
 import EventPresenter from './event-presenter.js';
-import { updateItem } from '../utils/utils.js';
-import { SORT_TYPE } from '../constants/mock-const.js';
 
 export default class MainPresenter {
   #model = null;
   #eventsContainer = null;
-
-  #sourcedPoints = [];
   #sortComponent = null;
+  #sourcedPoints = [];
   #events = [];
+
   #emptyListComponent = new EmptyList();
   #eventListComponent = new EventListView();
-  #currentSortType = SORT_TYPE.DEFAULT;
+  #currentSortType = SortType.DAY;
   #eventPresenters = new Map();
 
   constructor({ model, eventsContainer }) {
@@ -24,8 +25,11 @@ export default class MainPresenter {
   }
 
   init() {
-    this.#events = [...this.#model.events];
-    this.#sourcedPoints = [...this.#model.points];
+    this.#events = [...this.#model.events
+      .map((event) => this.#model.getEventDetails(event))];
+    this.#events.sort(SortFns[this.#currentSortType]);
+    this.#sourcedPoints = [...this.#events];
+
     this.#renderList();
   }
 
@@ -33,19 +37,13 @@ export default class MainPresenter {
     this.#eventPresenters.forEach((presenter) => presenter.resetView());
   };
 
-  #handleEventChange = (updateEvent) => {
-    this.#events = updateItem(this.#events, updateEvent);
-    this.#eventPresenters.get(updateEvent.id).init(updateEvent);
-  };
-
   #renderEvent(event) {
-    const eventDetails = this.#model.getEventDetails(event);
     const eventPresenter = new EventPresenter({
       eventListComponent: this.#eventListComponent.element,
       onDataChange: this.#handleEventChange,
       onModeViewChange: this.#handleModeViewChange
     });
-    eventPresenter.init(eventDetails);
+    eventPresenter.init(event);
     this.#eventPresenters.set(event.id, eventPresenter);
   }
 
@@ -57,7 +55,7 @@ export default class MainPresenter {
     this.#events.forEach((event) => this.#renderEvent(event));
   }
 
-  #renderList(){
+  #renderList() {
     if (this.#model.isEmpty()) {
       this.#renderEmptyList();
     } else {
@@ -65,11 +63,28 @@ export default class MainPresenter {
     }
   }
 
-  #renderSort(){
+  #clearList() {
+    this.#eventPresenters.forEach((presenter) => presenter.destroy());
+    this.#eventPresenters.clear();
+  }
+
+  #renderSort() {
     this.#sortComponent = new SortView({
-      onSortTypeChange: this.#handleSortTypeChange
+      onSortTypeChange: this.#handleSortTypeChange,
+      activeType: this.#currentSortType
     });
     render(this.#sortComponent, this.#eventsContainer);
+  }
+
+  #replaceSort() {
+    if (this.#sortComponent) {
+      const newSortComponent = new SortView({
+        onSortTypeChange: this.#handleSortTypeChange,
+        activeType: this.#currentSortType
+      });
+      replace(newSortComponent, this.#sortComponent);
+      this.#sortComponent = newSortComponent;
+    }
   }
 
   #renderListComponent() {
@@ -82,28 +97,25 @@ export default class MainPresenter {
     this.#renderEvents();
   }
 
-  #handleModeViewChange = () => {
-    this.#eventPresenters.forEach((presenter) => presenter.resetView());
-  };
-
   #handleEventChange = (updateEvent) => {
     this.#events = updateItem(this.#events, updateEvent);
-    this.#sourcedPoints = updateItem(this.#sourcedPoints, updateEvent)
+    this.#sourcedPoints = updateItem(this.#sourcedPoints, updateEvent);
     this.#eventPresenters.get(updateEvent.id).init(updateEvent);
   };
 
   #handleSortTypeChange = (sortType) => {
-    if(this.#currentSortType === sortType){
+    if (this.#currentSortType === sortType) {
       return;
     }
-    this.#sortTasks(sortType)
-  }
+    this.#currentSortType = sortType;
 
-  #sortTasks(sortType){
-    switch(sortType){
-      case SORT_TYPE.EVENT:
-        this.#events.sort()
-    }
-  }
+    this.#sortTasks(sortType);
+    this.#clearList();
+    this.#replaceSort();
+    this.#renderEvents();
+  };
 
+  #sortTasks(sortType) {
+    this.#events = [...this.#sourcedPoints].sort(SortFns[sortType]);
+  }
 }

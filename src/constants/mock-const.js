@@ -7,11 +7,4 @@ export const Offers = [
   { type: 'seats', title: 'Choose seats', price: 5 },
   { type: 'train', title: 'Travel by train', price: 40 }
 ];
-export const SORT_TYPE = {
-  DEFAULT: 'day',
-  EVENT: 'event',
-  TIME: 'time',
-  PRICE: 'price',
-  OFFER: 'offer'
-};
 

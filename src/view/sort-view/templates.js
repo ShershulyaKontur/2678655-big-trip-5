@@ -1,21 +1,23 @@
-import { SORT_TYPE } from '../../constants/mock-const';
+import { SortType } from '../../constants/sort-const';
 
-function createSortItemTemplate([_, value]) {
-  return `<div class="trip-sort__item trip-sort__item--${value}">
+function createSortItemTemplate([, value], activeType) {
+  const isChecked = value === activeType ? 'checked' : '';
+  return `<div class="trip-sort__item  trip-sort__item--${value}">
             <input
               id="sort-${value}"
-              class="trip-sort__input visually-hidden"
+              class="trip-sort__input  visually-hidden"
               type="radio"
               name="trip-sort"
               value="${value}"
               data-sort-type="${value}"
-              ${value === 'day' ? 'checked' : ''}>
+              ${isChecked}>
             <label class="trip-sort__btn" for="sort-${value}">${value}</label>
           </div>`;
 }
 
-export function createSortTemplate() {
+export function createSortTemplate(activeType) {
   return `<form class="trip-sort" action="#" method="get">
-            ${Object.entries(SORT_TYPE).map(createSortItemTemplate).join('')}
-          </form>`;
+    ${Object.entries(SortType)
+    .map(([key, value]) => createSortItemTemplate([key, value], activeType)).join('')}
+  </form>`;
 }
