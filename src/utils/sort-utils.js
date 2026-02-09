@@ -1,6 +1,8 @@
+import dayjs from 'dayjs';
+
 export const sortEventDay = (eventA, eventB) => {
-  const dateA = new Date(`${eventA.dateFrom} GMT+0700`);
-  const dateB = new Date(`${eventB.dateFrom} GMT+0700`);
+  const dateA = dayjs(eventA.dateFrom);
+  const dateB = dayjs(eventB.dateFrom);
   return dateA - dateB;
 };
 
@@ -11,12 +13,11 @@ export const sortEventName = (eventA, eventB) => {
 };
 
 export const sortEventTime = (eventA, eventB) => {
-  const timeA = new Date(eventA.dateTo) - new Date(eventA.dateFrom);
-  const timeB = new Date(eventB.dateTo) - new Date(eventB.dateFrom);
-  return timeA - timeB;
+  const timeA = dayjs(eventA.dateTo).diff(dayjs(eventA.dateFrom));
+  const timeB = dayjs(eventB.dateTo).diff(dayjs(eventB.dateFrom));
+  return timeB - timeA;
 };
 
-export const sortEventPrice = (eventA, eventB) => eventA.basePrice - eventB.basePrice;
+export const sortEventPrice = (eventA, eventB) => eventB.basePrice - eventA.basePrice;
 
-export const sortEventOffers = (eventA, eventB) => eventA.offers.length - eventB.offers.length;
-
+export const sortEventOffers = (eventA, eventB) => eventB.offers.length - eventA.offers.length;
