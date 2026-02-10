@@ -80,16 +80,15 @@ export default class ListPresenter {
   #render() {
     if (this.#events.length === 0) {
       this.#renderEmptyList();
-    } else {
-      this.#renderContent();
+      return;
     }
+    this.#renderContent();
   }
 
   #clearEventList() {
     this.#eventPresenters.forEach((presenter) => presenter.destroy());
     this.#eventPresenters.clear();
   }
-
 
   #sortTasks(sortType) {
     this.#events = [...this.#sourcedEvents].sort(SortFns[sortType]);

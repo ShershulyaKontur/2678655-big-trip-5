@@ -37,19 +37,23 @@ export default class EventPresenter {
       onEdit: () => this.#handleEditClick()
     });
 
+    const replaceEventElements = {
+      [Mode.DEFAULT]: () => {
+        replace(this.#eventComponent, prevEventComponent);
+        remove(prevEventEditForm);
+      },
+      [Mode.EDITING]: () => {
+        replace(this.#eventEditForm, prevEventEditForm);
+        remove(prevEventComponent);
+      }
+    };
+
     if (prevEventComponent === null || prevEventEditForm === null) {
       render(this.#eventComponent, this.#eventListComponent);
       return;
     }
 
-    if (this.#modeView === Mode.DEFAULT) {
-      replace(this.#eventComponent, prevEventComponent);
-    } else{
-      replace(this.#eventEditForm, prevEventEditForm);
-    }
-
-    remove(prevEventComponent);
-    remove(prevEventEditForm);
+    replaceEventElements[this.#modeView]();
   }
 
   destroy(){
