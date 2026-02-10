@@ -52,6 +52,10 @@ export default class EventPresenter {
     remove(prevEventEditForm);
   }
 
+  destroy(){
+    remove(this.#eventComponent);
+    remove(this.#eventEditForm);
+  }
 
   resetView() {
     if (this.#modeView !== Mode.DEFAULT) {

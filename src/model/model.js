@@ -37,9 +37,9 @@ export default class Model {
     return typeOffers.filter((offer) => event.offers.includes(offer.id));
   }
 
-  isEmpty() {
-    return this.events.length === 0;
-  }
+  // isEmpty() {
+  //   return this.events.length === 0;
+  // }
 
   getEventDetails(event) {
     const destination = this.#getDestinationById(event.destination);
