@@ -22,6 +22,7 @@ export default class EditFormView extends AbstractStatefulView{
   get template() {
     return createFormEditTemplate(this._state, this.#allDestinations);
   }
+
   reset() {
     this.updateElement(this.#originalState);
   }
