@@ -1,9 +1,6 @@
 import dayjs from 'dayjs';
-import { DATE_FORMAT } from '../constants/const';
 
-export function formatDate(date){
-  return date ? dayjs(date).format(DATE_FORMAT) : '';
-}
+export const humanizePointDueDate = (dueDate, dateFormat) => dueDate ? dayjs(dueDate).format(dateFormat) : '';
 
 export function getDuration(startDate, endDate) {
   const diffMinutes = dayjs(endDate).diff(startDate, 'minute');

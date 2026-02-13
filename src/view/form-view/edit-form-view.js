@@ -1,12 +1,20 @@
 import { createFormEditTemplate } from './templates.js';
-import AbstractView from '../../framework/view/abstract-view.js';
+import AbstractStatefulView from '../../framework/view/abstract-stateful-view.js';
 
-export default class EditFormView extends AbstractView{
+export default class EditFormView extends AbstractStatefulView{
   #handleSubmit = null;
   #handleClose = null;
+  #eventData = null;
+  #typeOffers = null;
+  #allDestinations = null;
+  #pointDestination = null;
 
-  constructor({onSubmit,onClose}){
+  constructor({eventData, onSubmit, onClose, typeOffers,pointDestination, allDestinations}){
     super();
+    this.#eventData = eventData;
+    this.#typeOffers = typeOffers;
+    this.#allDestinations = allDestinations;
+    this.#pointDestination = pointDestination;
     this.#handleSubmit = onSubmit;
     this.#handleClose = onClose;
     this.element.addEventListener('submit', this.#submitHandler);
@@ -14,7 +22,7 @@ export default class EditFormView extends AbstractView{
   }
 
   get template() {
-    return createFormEditTemplate();
+    return createFormEditTemplate(this.#eventData, this.#typeOffers, this.#allDestinations, this.#pointDestination);
   }
 
   #submitHandler = (evt) => {

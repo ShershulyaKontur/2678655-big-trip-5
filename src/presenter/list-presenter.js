@@ -10,6 +10,7 @@ import EventPresenter from './event-presenter.js';
 export default class ListPresenter {
   #container = null;
   #sortComponent = null;
+  #model = null;
 
   #events = [];
   #sourcedEvents = [];
@@ -19,8 +20,9 @@ export default class ListPresenter {
   #emptyListComponent = new EmptyList();
   #currentSortType = SortType.DAY;
 
-  constructor({ container }) {
+  constructor({ container, model }) {
     this.#container = container;
+    this.#model = model;
   }
 
   init(events) {
@@ -61,6 +63,7 @@ export default class ListPresenter {
 
   #renderEvent(event) {
     const eventPresenter = new EventPresenter({
+      model: this.#model,
       eventListComponent: this.#eventListComponent.element,
       onDataChange: this.#handleEventChange,
       onModeViewChange: this.#handleModeViewChange

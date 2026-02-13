@@ -16,6 +16,7 @@ export default class MainPresenter {
     );
     this.#listPresenter = new ListPresenter({
       container: this.#eventsContainer,
+      model: this.#model
     });
     this.#listPresenter.init(events);
   }

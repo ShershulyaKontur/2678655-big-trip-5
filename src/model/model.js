@@ -23,23 +23,24 @@ export default class Model {
     return this.#destinations;
   }
 
-  #getDestinationById(id) {
-    return this.destinations?.find((el) => el.id === id) ?? null;
+  getDestinationById(id) {
+    const destinationById = this.destinations?.find((el) => el.id === id);
+    return destinationById ?? null;
   }
 
-  #getOfferByType(type) {
+  getOfferByType(type) {
     const group = this.offers?.find((el) => el.type === type);
     return group.offers ?? [];
   }
 
-  #getOffersForPoint(event) {
-    const typeOffers = this.#getOfferByType(event.type);
+  getOffersForId(event) {
+    const typeOffers = this.getOfferByType(event.type);
     return typeOffers.filter((offer) => event.offers.includes(offer.id));
   }
 
   getEventDetails(event) {
-    const destination = this.#getDestinationById(event.destination);
-    const offers = this.#getOffersForPoint(event);
+    const destination = this.getDestinationById(event.destination);
+    const offers = this.getOffersForId(event);
 
     return {
       ...event,

@@ -11,6 +11,22 @@ export const mockDestinations = [
       {
         src: 'https://24.objects.htmlacademy.pro/static/destinations/11.jpg',
         description: 'Monaco famous for its crowded street markets with the best street food in Asia'
+      },
+      {
+        src: 'https://24.objects.htmlacademy.pro/static/destinations/1.jpg',
+        description: 'Monaco with crowded streets'
+      },
+      {
+        src: 'https://24.objects.htmlacademy.pro/static/destinations/2.jpg',
+        description: 'Monaco famous for its crowded street markets with the best street food in Asia'
+      },
+      {
+        src: 'https://24.objects.htmlacademy.pro/static/destinations/3.jpg',
+        description: 'Monaco with crowded streets'
+      },
+      {
+        src: 'https://24.objects.htmlacademy.pro/static/destinations/4.jpg',
+        description: 'Monaco famous for its crowded street markets with the best street food in Asia'
       }
     ]
   },
