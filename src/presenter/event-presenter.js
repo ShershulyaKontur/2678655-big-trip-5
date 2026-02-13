@@ -33,7 +33,7 @@ export default class EventPresenter {
       allOffers: this.#model.offers,
       allDestinations: this.#model.destinations,
       typeOffers: this.#model.getOfferByType(eventData.type),
-      pointDestination: this.#model.getDestinationById(eventData.destination.id),
+      eventDestination: this.#model.getDestinationById(eventData.destination.id),
       onSubmit: () => this.#handleFormSubmit(),
       onClose: () => this.#handleFormClose()
     });

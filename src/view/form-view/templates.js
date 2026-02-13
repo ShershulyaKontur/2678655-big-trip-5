@@ -1,5 +1,5 @@
 import { DateFormat } from '../../constants/const.js';
-import { DEST_COUNTRY, EVENT_TYPE, Offers } from '../../constants/mock-const.js';
+import { EVENT_TYPE } from '../../constants/mock-const.js';
 import { humanizePointDueDate } from '../../utils/formatter.js';
 import { capitalizeFirstLetter } from '../../utils/utils.js';
 
@@ -56,12 +56,11 @@ export function createFormCreateTemplate(){
 
               <div class="event__field-group  event__field-group--destination">
                 <label class="event__label  event__type-output" for="event-destination-1">
-                  Flight
+                 ${type}
                 </label>
                 <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="Geneva" list="destination-list-1">
                 <datalist id="destination-list-1">
-                  ${DEST_COUNTRY.map((country) => createCountryOptionTemplate(country)).join('')}
-                </datalist>
+                  ${destinationsData.map((destination) => createCountryOptionTemplate(destination)).join('')}                 </datalist>
               </div>
 
               <div class="event__field-group  event__field-group--time">
@@ -87,7 +86,7 @@ export function createFormCreateTemplate(){
               <section class="event__section  event__section--offers">
                 <h3 class="event__section-title  event__section-title--offers">Offers</h3>
                 <div class="event__available-offers">
-                  ${Offers.map((offer, index) => createOffersItemTemplate(offer, index)).join('')}
+                  ${offersData.map((offer) => createOffersItemTemplate(offer, offers)).join('')}
                 </div>
               </section>
               <section class="event__section  event__section--destination">
@@ -97,9 +96,9 @@ export function createFormCreateTemplate(){
             </section>
           </form>`;
 }
-export function createFormEditTemplate(eventData, offersData, destinationsData, pointDestination){
+export function createFormEditTemplate(eventData, offersData, destinationsData){
   const { type, offers, basePrice, dateFrom, dateTo } = eventData;
-  const { name, description, pictures } = pointDestination;
+  const { name, description, pictures } = eventData.destination;
 
   const startDay = humanizePointDueDate(dateFrom, DateFormat.FULL_DATE_FORMAT);
   const endDay = humanizePointDueDate(dateTo, DateFormat.FULL_DATE_FORMAT);
@@ -116,7 +115,7 @@ export function createFormEditTemplate(eventData, offersData, destinationsData, 
                 <div class="event__type-list">
                   <fieldset class="event__type-group">
                     <legend class="visually-hidden">Event type</legend>
-                    ${EVENT_TYPE.map((eventType) => createEventTypeItemTemplate(eventType)).join('')}
+                    ${EVENT_TYPE.map((eventType, index) => createEventTypeItemTemplate(eventType, index)).join('')}
                   </fieldset>
                 </div>
               </div>
