@@ -6,6 +6,7 @@ export default class EditFormView extends AbstractStatefulView{
   #closeHandler = null;
   #allDestinations = [];
   #allOffers = null;
+  #originalState = null;
 
   constructor({eventData, typeOffers, allDestinations, allOffers, onSubmit, onClose}){
     super();
@@ -13,12 +14,16 @@ export default class EditFormView extends AbstractStatefulView{
     this.#allOffers = allOffers;
     this.#handleFormSubmit = onSubmit;
     this.#closeHandler = onClose;
+    this.#originalState = structuredClone({...eventData});
     this._setState(EditFormView.parseEventToState(eventData, typeOffers));
     this._restoreHandlers();
   }
 
   get template() {
     return createFormEditTemplate(this._state, this.#allDestinations);
+  }
+  reset() {
+    this.updateElement(this.#originalState);
   }
 
   _restoreHandlers() {
@@ -44,7 +49,7 @@ export default class EditFormView extends AbstractStatefulView{
 
   #editRollUpHandler = (evt) => {
     evt.preventDefault();
-    this.#closeHandler(EditFormView.parseStateToEvent(this._state));
+    this.#closeHandler();
   };
 
   #typeListChangeHandler = (evt) => {
