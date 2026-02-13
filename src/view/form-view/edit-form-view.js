@@ -2,48 +2,90 @@ import { createFormEditTemplate } from './templates.js';
 import AbstractStatefulView from '../../framework/view/abstract-stateful-view.js';
 
 export default class EditFormView extends AbstractStatefulView{
-  #handleSubmit = null;
-  #handleClose = null;
-  #eventData = null;
-  #typeOffers = null;
-  #allDestinations = null;
+  #handleFormSubmit = null;
+  #closeHandler = null;
+  #allDestinations = [];
+  #allOffers = null;
 
-  constructor({eventData, onSubmit, onClose, typeOffers, allDestinations}){
+  constructor({eventData, typeOffers, allDestinations, allOffers, onSubmit, onClose}){
     super();
-    this.#eventData = eventData;
-    this.#typeOffers = typeOffers;
     this.#allDestinations = allDestinations;
-    this.#handleSubmit = onSubmit;
-    this.#handleClose = onClose;
-    this._setState(EditFormView.parseEventToState(eventData, typeOffers))
-    this.element.addEventListener('submit', this.#submitHandler);
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#closeHandler);
+    this.#allOffers = allOffers;
+    this.#handleFormSubmit = onSubmit;
+    this.#closeHandler = onClose;
+    this._setState(EditFormView.parseEventToState(eventData, typeOffers));
+    this._restoreHandlers();
   }
 
   get template() {
-    return createFormEditTemplate(this.#eventData, this.#typeOffers, this.#allDestinations);
+    return createFormEditTemplate(this._state, this.#allDestinations);
   }
 
-  #submitHandler = (evt) => {
+  _restoreHandlers() {
+    this.element.addEventListener('submit', this.#formSubmitHandler);
+
+    this.element.querySelector('.event__rollup-btn')
+      .addEventListener('click', this.#editRollUpHandler);
+
+    this.element.querySelector('.event__type-group')
+      .addEventListener('change', this.#typeListChangeHandler);
+
+    this.element.querySelector('.event__input--destination')
+      .addEventListener('change', this.#destinationChangeHandler);
+
+    this.element.querySelector('.event__input--price')
+      .addEventListener('input', this.#priceChangeHandler);
+  }
+
+  #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleSubmit();
+    this.#handleFormSubmit(EditFormView.parseStateToEvent(this._state));
   };
 
-  #closeHandler = () => {
-    this.#handleClose();
+  #editRollUpHandler = (evt) => {
+    evt.preventDefault();
+    this.#closeHandler(EditFormView.parseStateToEvent(this._state));
+  };
+
+  #typeListChangeHandler = (evt) => {
+    evt.preventDefault();
+    const targetType = evt.target.value;
+    const typeOffers = this.#allOffers.find((item) => item.type === targetType);
+
+    this.updateElement({
+      type: targetType,
+      allOffersType: typeOffers.offers,
+    });
+  };
+
+  #destinationChangeHandler = (evt) => {
+    evt.preventDefault();
+    const targetDestination = evt.target.value;
+    const newDestination = this.#allDestinations.find((item) => item.name === targetDestination);
+    this.updateElement({
+      destination: newDestination
+    });
+  };
+
+
+  #priceChangeHandler = (evt) => {
+    evt.preventDefault();
+    const newPrice = evt.target.value;
+    this._setState({
+      basePrice: newPrice
+    });
   };
 
   static parseEventToState(eventData, typeOffers) {
     return {
       ...eventData,
-      typeOffers
+      allOffersType: typeOffers
     };
   }
 
   static parseStateToEvent(state) {
     const event = {...state};
-
-    delete event.typeOffers;
+    delete event.allOffersType;
 
     return event;
   }

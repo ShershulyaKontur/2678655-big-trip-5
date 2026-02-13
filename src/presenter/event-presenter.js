@@ -30,10 +30,9 @@ export default class EventPresenter {
 
     this.#eventEditForm = new EditFormView({
       eventData,
-      allOffers: this.#model.offers,
       allDestinations: this.#model.destinations,
+      allOffers: this.#model.offers,
       typeOffers: this.#model.getOfferByType(eventData.type),
-      eventDestination: this.#model.getDestinationById(eventData.destination.id),
       onSubmit: () => this.#handleFormSubmit(),
       onClose: () => this.#handleFormClose()
     });
