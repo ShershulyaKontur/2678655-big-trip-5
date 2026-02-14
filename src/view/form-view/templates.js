@@ -37,7 +37,7 @@ function createOffersItemTemplate({title, price, id}, selectedOffers) {
           </div>`;
 }
 
-export function createFormEditTemplate(state, destinationsData){
+export function createFormEditTemplate(state, destinationsData, offersTypes){
   const { type, offers, allOffersType, basePrice, dateFrom, dateTo } = state;
   const { name, description, pictures } = state.destination;
 
@@ -56,7 +56,7 @@ export function createFormEditTemplate(state, destinationsData){
                 <div class="event__type-list">
                   <fieldset class="event__type-group">
                     <legend class="visually-hidden">Event type</legend>
-                    ${EVENT_TYPE.map((eventType, index) => createEventTypeItemTemplate(eventType, index)).join('')}
+                    ${offersTypes.map((type, index) => createEventTypeItemTemplate(type, index)).join('')}
                   </fieldset>
                 </div>
               </div>

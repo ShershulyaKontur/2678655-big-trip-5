@@ -38,6 +38,11 @@ export default class Model {
     return typeOffers.filter((offer) => event.offers.includes(offer.id));
   }
 
+  getOffersTypes(){
+    const offersTypes = this.offers?.map((offer) => offer.type);
+    return offersTypes ?? [];
+  }
+
   getEventDetails(event) {
     const destination = this.getDestinationById(event.destination);
     const offers = this.getOffersForId(event);
