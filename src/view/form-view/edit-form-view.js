@@ -26,6 +26,7 @@ export default class EditFormView extends AbstractStatefulView{
   }
 
   reset() {
+    console.log('reset')
     this.updateElement(this.#originalState);
   }
 

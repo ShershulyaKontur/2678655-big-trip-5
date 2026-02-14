@@ -70,7 +70,6 @@ export default class EventPresenter {
 
   resetView() {
     if (this.#modeView !== Mode.DEFAULT) {
-      this.#eventEditForm.reset();
       this.#replaceFormToEvent();
     }
   }
@@ -108,6 +107,7 @@ export default class EventPresenter {
   }
 
   #handleFormClose() {
+    this.#eventEditForm.reset();
     this.#replaceFormToEvent();
   }
 
