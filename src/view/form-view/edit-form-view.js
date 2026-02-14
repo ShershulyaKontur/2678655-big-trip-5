@@ -5,19 +5,19 @@ export default class EditFormView extends AbstractStatefulView{
   #handleFormSubmit = null;
   #closeHandler = null;
   #allDestinations = [];
-  #allOffersByType = null;
+  #allOffers = null;
   #offersTypes = null;
   #originalState = null;
 
-  constructor({eventData, allOffersByType, typeOffers, offersTypes, allDestinations, onSubmit, onClose}){
+  constructor({eventData, allOffers, offersByType, offersTypes, allDestinations, onSubmit, onClose}){
     super();
     this.#allDestinations = allDestinations;
-    this.#allOffersByType = allOffersByType;
+    this.#allOffers = allOffers;
     this.#offersTypes = offersTypes;
     this.#handleFormSubmit = onSubmit;
     this.#closeHandler = onClose;
     this.#originalState = structuredClone({...eventData});
-    this._setState(EditFormView.parseEventToState(eventData, typeOffers));
+    this._setState(EditFormView.parseEventToState(eventData, offersByType));
     this._restoreHandlers();
   }
 
@@ -58,7 +58,7 @@ export default class EditFormView extends AbstractStatefulView{
   #typeListChangeHandler = (evt) => {
     evt.preventDefault();
     const targetType = evt.target.value;
-    const typeOffers = this.#allOffersByType.find((item) => item.type === targetType);
+    const typeOffers = this.#allOffers.find((item) => item.type === targetType);
 
     this.updateElement({
       type: targetType,
@@ -84,10 +84,10 @@ export default class EditFormView extends AbstractStatefulView{
     });
   };
 
-  static parseEventToState(eventData, typeOffers) {
+  static parseEventToState(eventData, offersByType) {
     return {
       ...eventData,
-      allOffersType: typeOffers
+      allOffersType: offersByType
     };
   }
 
