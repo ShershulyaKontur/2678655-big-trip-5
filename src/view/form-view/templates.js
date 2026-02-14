@@ -56,7 +56,7 @@ export function createFormEditTemplate(state, destinationsData, offersTypes){
                 <div class="event__type-list">
                   <fieldset class="event__type-group">
                     <legend class="visually-hidden">Event type</legend>
-                    ${offersTypes.map((type, index) => createEventTypeItemTemplate(type, index)).join('')}
+                    ${offersTypes.map((offerType, index) => createEventTypeItemTemplate(offerType, index)).join('')}
                   </fieldset>
                 </div>
               </div>

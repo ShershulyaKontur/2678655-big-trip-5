@@ -6,7 +6,7 @@ export default class EditFormView extends AbstractStatefulView{
   #closeHandler = null;
   #allDestinations = [];
   #allOffersByType = null;
-  #offersTypes = null
+  #offersTypes = null;
   #originalState = null;
 
   constructor({eventData, allOffersByType, typeOffers, offersTypes, allDestinations, onSubmit, onClose}){
@@ -26,7 +26,6 @@ export default class EditFormView extends AbstractStatefulView{
   }
 
   reset() {
-    console.log('reset')
     this.updateElement(this.#originalState);
   }
 
