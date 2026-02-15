@@ -1,22 +1,27 @@
-import { formatDate, getDuration } from '../../utils/formatter.js';
+import { DateFormat } from '../../constants/const.js';
+import { humanizePointDueDate, getDuration } from '../../utils/formatter.js';
 
 export function createEventItemsTemplate({type, dateFrom, dateTo, basePrice, isFavorite, offers, destination}){
   const { name } = destination;
 
+  const startDay = humanizePointDueDate(dateFrom, DateFormat.DATE_FROM_FORMAT);
+  const endDay = humanizePointDueDate(dateTo, DateFormat.DATE_FROM_FORMAT);
+  const durationDay = getDuration(dateFrom, dateTo);
+
   return `<li class="trip-events__item">
             <div class="event">
-              <time class="event__date" datetime="${dateFrom}">${formatDate(dateFrom)}</time>
+              <time class="event__date" datetime="${dateFrom}">${startDay}</time>
               <div class="event__type">
                 <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
               </div>
               <h3 class="event__title">${type} ${name}</h3>
               <div class="event__schedule">
                 <p class="event__time">
-                  <time class="event__start-time" datetime=${dateFrom}>${formatDate(dateFrom)}</time>
+                  <time class="event__start-time" datetime=${dateFrom}>${startDay}</time>
                   &mdash;
-                  <time class="event__end-time" datetime=${dateTo}>${formatDate(dateTo)}</time>
+                  <time class="event__end-time" datetime=${dateTo}>${endDay}</time>
                 </p>
-                <p class="event__duration">${getDuration(dateFrom, dateTo)}</p>
+                <p class="event__duration">${durationDay}</p>
               </div>
               <p class="event__price">
                 &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
