@@ -24,8 +24,7 @@ export default class Model {
   }
 
   getDestinationById(id) {
-    const destinationById = this.destinations?.find((el) => el.id === id);
-    return destinationById ?? null;
+    return this.destinations?.find((el) => el.id === id) ?? null;
   }
 
   getOfferByType(type) {
@@ -39,8 +38,7 @@ export default class Model {
   }
 
   getOffersTypes(){
-    const offersTypes = this.offers?.map((offer) => offer.type);
-    return offersTypes ?? [];
+    return this.offers?.map((offer) => offer.type) ?? [];
   }
 
   getEventDetails(event) {
