@@ -1,5 +1,8 @@
 import { createFormEditTemplate } from './templates.js';
 import AbstractStatefulView from '../../framework/view/abstract-stateful-view.js';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
+import { DateFormat } from '../../constants/const.js';
 
 export default class EditFormView extends AbstractStatefulView{
   #handleFormSubmit = null;
@@ -8,6 +11,9 @@ export default class EditFormView extends AbstractStatefulView{
   #allOffers = null;
   #offersTypes = null;
   #originalState = null;
+  #datepickerFrom = null;
+  #datepickerTo = null;
+
 
   constructor({eventData, allOffers, offersByType, offersTypes, allDestinations, onSubmit, onClose}){
     super();
@@ -43,6 +49,9 @@ export default class EditFormView extends AbstractStatefulView{
 
     this.element.querySelector('.event__input--price')
       .addEventListener('input', this.#priceChangeHandler);
+
+    this.#setDatepickerFrom();
+    this.#setDatepickerTo();
   }
 
   #formSubmitHandler = (evt) => {
@@ -83,6 +92,60 @@ export default class EditFormView extends AbstractStatefulView{
       basePrice: newPrice
     });
   };
+
+  #dateFromChangeHandler = ([userDate]) => {
+    this.updateElement({
+      dateFrom: userDate,
+    });
+  };
+
+  #dateToChangeHandler = ([userDate]) => {
+    this.updateElement({
+      dateTo: userDate,
+    });
+  };
+
+  #setDatepickerFrom() {
+    this.#datepickerFrom = flatpickr(
+      this.element.querySelector('#event-start-time-1'),
+      {
+        dateFormat: DateFormat.FLATPICKR_FORMAT,
+        enableTime: true,
+        'time_24hr': true,
+        defaultDate: this._state.dateFrom,
+        onChange: this.#dateFromChangeHandler,
+        maxDate: this._state.dateTo,
+      }
+    );
+  }
+
+  #setDatepickerTo() {
+    this.#datepickerTo = flatpickr(
+      this.element.querySelector('#event-end-time-1'),
+      {
+        dateFormat: DateFormat.FLATPICKR_FORMAT,
+        enableTime: true,
+        'time_24hr': true,
+        defaultDate: this._state.dateTo,
+        onChange: this.#dateToChangeHandler,
+        minDate: this._state.dateFrom,
+      }
+    );
+  }
+
+  removeElement() {
+    super.removeElement();
+
+    if (this.#datepickerTo) {
+      this.#datepickerTo.destroy();
+      this.#datepickerTo = null;
+    }
+
+    if (this.#datepickerFrom) {
+      this.#datepickerFrom.destroy();
+      this.#datepickerFrom = null;
+    }
+  }
 
   static parseEventToState(eventData, offersByType) {
     return {
