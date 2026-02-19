@@ -1,5 +1,4 @@
 import { render, replace } from '../framework/render.js';
-import { updateItem } from '../utils/utils.js';
 import { SortType } from '../constants/sort-const.js';
 import { SortFns } from '../constants/sort-const.js';
 import SortView from '../view/sort-view/sort-view.js';
@@ -12,9 +11,6 @@ export default class ListPresenter {
   #sortComponent = null;
   #model = null;
 
-  #events = [];
-  #sourcedEvents = [];
-
   #eventPresenters = new Map();
   #eventListComponent = new EventListView();
   #emptyListComponent = new EmptyList();
@@ -25,10 +21,11 @@ export default class ListPresenter {
     this.#model = model;
   }
 
-  init(events) {
-    this.#events = [...events];
-    this.#sourcedEvents = [...this.#events];
-    this.#events.sort(SortFns[this.#currentSortType]);
+  get events() {
+    return [...this.#model.allEvents].sort(SortFns[this.#currentSortType]);
+  }
+
+  init() {
     this.#render();
   }
 
@@ -73,7 +70,7 @@ export default class ListPresenter {
   }
 
   #renderEvents() {
-    this.#events.forEach((event) => this.#renderEvent(event));
+    this.events.forEach((event) => this.#renderEvent(event));
   }
 
   #renderEmptyList() {
@@ -81,7 +78,7 @@ export default class ListPresenter {
   }
 
   #render() {
-    if (this.#events.length === 0) {
+    if (this.events.length === 0) {
       this.#renderEmptyList();
       return;
     }
@@ -93,17 +90,12 @@ export default class ListPresenter {
     this.#eventPresenters.clear();
   }
 
-  #sortTasks(sortType) {
-    this.#events = [...this.#sourcedEvents].sort(SortFns[sortType]);
-  }
-
   setSortType(sortType) {
     if (this.#currentSortType === sortType) {
       return;
     }
 
     this.#currentSortType = sortType;
-    this.#sortTasks(sortType);
     this.#replaceSort();
     this.#clearEventList();
     this.#renderEvents();
@@ -114,8 +106,8 @@ export default class ListPresenter {
   };
 
   #handleEventChange = (updateEvent) => {
-    this.#events = updateItem(this.#events, updateEvent);
-    this.#eventPresenters.get(updateEvent.id).init(updateEvent);
+    // this.#eventPresenters.get(updateEvent.id).init(updateEvent);
+    this.#model.updateEvent(updateEvent);
   };
 
   #handleModeViewChange = () => {

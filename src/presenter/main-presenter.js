@@ -11,14 +11,11 @@ export default class MainPresenter {
   }
 
   init() {
-    const events = this.#model.events.map((event) =>
-      this.#model.getEventDetails(event)
-    );
     this.#listPresenter = new ListPresenter({
       container: this.#eventsContainer,
       model: this.#model
     });
-    this.#listPresenter.init(events);
+    this.#listPresenter.init();
   }
 
 }

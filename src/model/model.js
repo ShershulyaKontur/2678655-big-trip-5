@@ -1,11 +1,13 @@
 import { getDestinations, getOffers, getEvents } from '../mock/mock-utils.js';
+import Observable from '../framework/observable.js'
 
-export default class Model {
+export default class Model extends Observable {
   #events = null;
   #offers = null;
   #destinations = null;
 
   constructor() {
+    super();
     this.#events = getEvents();
     this.#offers = getOffers();
     this.#destinations = getDestinations();
@@ -15,12 +17,26 @@ export default class Model {
     return this.#events;
   }
 
+  set events(events) {
+    this.#events = [...events];
+    this._notify(events);
+  }
+
   get offers() {
     return this.#offers;
   }
 
   get destinations() {
     return this.#destinations;
+  }
+
+  get allEvents(){
+    return this.#events.map((event) => this.getEventDetails(event));
+  }
+
+  updateEvent(update) {
+    this.#events = this.#events.map((event) => event.id === update.id ? update : event);
+    this._notify(update);
   }
 
   getDestinationById(id) {
@@ -45,10 +61,6 @@ export default class Model {
     const destination = this.getDestinationById(event.destination);
     const offers = this.getOffersForId(event);
 
-    return {
-      ...event,
-      offers,
-      destination
-    };
+    return {...event, offers, destination};
   }
 }
