@@ -25,7 +25,7 @@ export default class ListPresenter {
   }
 
   get events() {
-    return [...this.#model.allEvents].sort(SortFns[this.#currentSortType]);
+    return [...this.#model.fullEvents].sort(SortFns[this.#currentSortType]);
   }
 
   init() {

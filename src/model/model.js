@@ -17,7 +17,7 @@ export default class Model extends Observable {
     return this.#events;
   }
 
-  get allEvents(){
+  get fullEvents(){
     return this.events.map((event) => this.getEventDetails(event));
   }
 
