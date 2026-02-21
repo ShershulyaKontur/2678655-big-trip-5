@@ -1,4 +1,4 @@
-import { render, replace } from '../framework/render.js';
+import { render, replace, remove } from '../framework/render.js';
 import { SortType } from '../constants/sort-const.js';
 import { SortFns } from '../constants/sort-const.js';
 import { UpdateType, UserAction } from '../constants/const.js';
@@ -9,12 +9,12 @@ import EventPresenter from './event-presenter.js';
 
 export default class ListPresenter {
   #container = null;
-  #sortComponent = null;
   #model = null;
+  #sortComponent = null;
+  #eventListComponent = null;
+  #emptyListComponent = null;
 
   #eventPresenters = new Map();
-  #eventListComponent = new EventListView();
-  #emptyListComponent = new EmptyList();
   #currentSortType = SortType.DAY;
 
   constructor({ container, model }) {
@@ -32,10 +32,26 @@ export default class ListPresenter {
     this.#render();
   }
 
-  #renderContent() {
+  #render() {
+    if (this.events.length === 0) {
+      this.#renderEmptyList();
+      return;
+    }
+
     this.#renderSort();
     this.#renderEventListComponent();
     this.#renderEvents();
+  }
+
+  #clearList({ resetSortType = false } = {}) {
+    this.#clearEvents();
+
+    remove(this.#emptyListComponent);
+    remove(this.#eventListComponent);
+
+    if (resetSortType) {
+      this.#currentSortType = SortType.DAY;
+    }
   }
 
   #renderSort() {
@@ -58,6 +74,7 @@ export default class ListPresenter {
   }
 
   #renderEventListComponent() {
+    this.#eventListComponent = new EventListView();
     render(this.#eventListComponent, this.#container);
   }
 
@@ -76,21 +93,14 @@ export default class ListPresenter {
     this.events.forEach((event) => this.#renderEvent(event));
   }
 
-  #renderEmptyList() {
-    render(this.#emptyListComponent, this.#container);
-  }
-
-  #render() {
-    if (this.events.length === 0) {
-      this.#renderEmptyList();
-      return;
-    }
-    this.#renderContent();
-  }
-
-  #clearEventList() {
+  #clearEvents(){
     this.#eventPresenters.forEach((presenter) => presenter.destroy());
     this.#eventPresenters.clear();
+  }
+
+  #renderEmptyList() {
+    this.#emptyListComponent = new EmptyList();
+    render(this.#emptyListComponent, this.#container);
   }
 
   setSortType(sortType) {
@@ -100,7 +110,7 @@ export default class ListPresenter {
 
     this.#currentSortType = sortType;
     this.#replaceSort();
-    this.#clearEventList();
+    this.#clearEvents();
     this.#renderEvents();
   }
 
@@ -113,15 +123,23 @@ export default class ListPresenter {
   };
 
   #handleModelEvent = (updateType, data) => {
-    switch(updateType) {
-      case UpdateType.MINOR:
+    switch (updateType) {
+      case UpdateType.PATCH:
         this.#eventPresenters.get(data.id).init(data);
+        break
+      case UpdateType.MINOR:
+        this.#clearList();
+        this.#render();
+        break;
+      case UpdateType.MAJOR:
+        this.#clearList({resetSortType: true});
+        this.#render();
         break;
     }
   };
 
   #handleViewAction = (actionType, updateType, update) => {
-    switch(actionType){
+    switch (actionType) {
       case UserAction.UPDATE_EVENT:
         this.#model.updateEvent(updateType, update);
         break;
@@ -133,5 +151,4 @@ export default class ListPresenter {
         break;
     }
   };
-
 }

@@ -1,6 +1,6 @@
 import { generateFilters } from './mock/filters.js';
 import Model from './model/model.js';
-import FiltersPresenter from './presenter/filter-presenter.js';
+import FiltersPresenter from './presenter/filters-presenter.js';
 import MainPresenter from './presenter/main-presenter.js';
 
 const filtersContainer = document.querySelector('.trip-controls__filters');
