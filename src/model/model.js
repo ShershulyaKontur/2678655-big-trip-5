@@ -34,9 +34,9 @@ export default class Model extends Observable {
     return this.#destinations;
   }
 
-
   updateEvent(updateType, update) {
     const index = this.events.findIndex((task) => task.id === update.id);
+
     if (index === -1) {
       throw new Error('Can\'t update unexisting task');
     }
@@ -95,7 +95,6 @@ export default class Model extends Observable {
   getEventDetails(event) {
     const destination = this.getDestinationById(event.destination);
     const offers = this.getOffersForId(event);
-
     return {...event, offers, destination};
   }
 }
