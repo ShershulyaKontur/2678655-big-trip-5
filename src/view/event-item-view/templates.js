@@ -3,7 +3,6 @@ import { humanizePointDueDate, getDuration } from '../../utils/formatter.js';
 
 export function createEventItemsTemplate({type, dateFrom, dateTo, basePrice, isFavorite, offers, destination}){
   const { name } = destination;
-
   const startDay = humanizePointDueDate(dateFrom, DateFormat.DATE_FROM_FORMAT);
   const endDay = humanizePointDueDate(dateTo, DateFormat.DATE_FROM_FORMAT);
   const durationDay = getDuration(dateFrom, dateTo);

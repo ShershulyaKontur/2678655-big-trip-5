@@ -2,6 +2,7 @@ import { render, replace, remove } from '../framework/render.js';
 import EventItemView from '../view/event-item-view/event-item-view.js';
 import EditFormView from '../view/form-view/edit-form-view.js';
 import { ESC_KEY, Mode } from '../constants/const.js';
+import { UpdateType, UserAction } from '../constants/const.js';
 
 export default class EventPresenter {
   #eventEditForm = null;
@@ -75,10 +76,11 @@ export default class EventPresenter {
   }
 
   #handleFavoriteClick() {
-    this.#handleEventChange({
-      ...this.#eventData,
-      isFavorite: !this.#eventData.isFavorite
-    });
+    this.#handleEventChange(
+      UserAction.UPDATE_EVENT,
+      UpdateType.MINOR,
+      {...this.#eventData, isFavorite: !this.#eventData.isFavorite}
+    );
   }
 
   #replaceEventToForm() {

@@ -1,5 +1,5 @@
 import { getDestinations, getOffers, getEvents } from '../mock/mock-utils.js';
-import Observable from '../framework/observable.js'
+import Observable from '../framework/observable.js';
 
 export default class Model extends Observable {
   #events = null;
@@ -17,6 +17,10 @@ export default class Model extends Observable {
     return this.#events;
   }
 
+  get allEvents(){
+    return this.events.map((event) => this.getEventDetails(event));
+  }
+
   set events(events) {
     this.#events = [...events];
     this._notify(events);
@@ -30,13 +34,44 @@ export default class Model extends Observable {
     return this.#destinations;
   }
 
-  get allEvents(){
-    return this.#events.map((event) => this.getEventDetails(event));
+
+  updateEvent(updateType, update) {
+    const index = this.events.findIndex((task) => task.id === update.id);
+    if (index === -1) {
+      throw new Error('Can\'t update unexisting task');
+    }
+
+    this.events = [
+      ...this.#events.slice(0, index),
+      update,
+      ...this.#events.slice(index + 1),
+    ];
+
+    this._notify(updateType, update);
   }
 
-  updateEvent(update) {
-    this.#events = this.#events.map((event) => event.id === update.id ? update : event);
-    this._notify(update);
+  addEvent(updateType, update) {
+    this.events = [
+      update,
+      ...this.#events,
+    ];
+
+    this._notify(updateType, update);
+  }
+
+  deleteEvent(updateType, update) {
+    const index = this.events.findIndex((task) => task.id === update.id);
+
+    if (index === -1) {
+      throw new Error('Can\'t delete unexisting task');
+    }
+
+    this.events = [
+      ...this.#events.slice(0, index),
+      ...this.#events.slice(index + 1),
+    ];
+
+    this._notify(updateType);
   }
 
   getDestinationById(id) {

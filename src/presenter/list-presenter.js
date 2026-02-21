@@ -1,6 +1,7 @@
 import { render, replace } from '../framework/render.js';
 import { SortType } from '../constants/sort-const.js';
 import { SortFns } from '../constants/sort-const.js';
+import { UpdateType, UserAction } from '../constants/const.js';
 import SortView from '../view/sort-view/sort-view.js';
 import EventListView from '../view/event-list-view/event-list-view.js';
 import EmptyList from '../view/list-empty-view/list-empty-view.js';
@@ -19,6 +20,8 @@ export default class ListPresenter {
   constructor({ container, model }) {
     this.#container = container;
     this.#model = model;
+
+    this.#model.addObserver(this.#handleModelEvent);
   }
 
   get events() {
@@ -62,7 +65,7 @@ export default class ListPresenter {
     const eventPresenter = new EventPresenter({
       model: this.#model,
       eventListComponent: this.#eventListComponent.element,
-      onDataChange: this.#handleEventChange,
+      onDataChange: this.#handleViewAction,
       onModeViewChange: this.#handleModeViewChange
     });
     eventPresenter.init(event);
@@ -105,12 +108,30 @@ export default class ListPresenter {
     this.setSortType(sortType);
   };
 
-  #handleEventChange = (updateEvent) => {
-    // this.#eventPresenters.get(updateEvent.id).init(updateEvent);
-    this.#model.updateEvent(updateEvent);
-  };
-
   #handleModeViewChange = () => {
     this.#eventPresenters.forEach((presenter) => presenter.resetView());
   };
+
+  #handleModelEvent = (updateType, data) => {
+    switch(updateType) {
+      case UpdateType.MINOR:
+        this.#eventPresenters.get(data.id).init(data);
+        break;
+    }
+  };
+
+  #handleViewAction = (actionType, updateType, update) => {
+    switch(actionType){
+      case UserAction.UPDATE_EVENT:
+        this.#model.updateEvent(updateType, update);
+        break;
+      case UserAction.ADD_EVENT:
+        this.#model.addEvent(updateType, update);
+        break;
+      case UserAction.DELETE_EVENT:
+        this.#model.deleteEvent(updateType, update);
+        break;
+    }
+  };
+
 }
