@@ -8,12 +8,11 @@ export default class EventPresenter {
   #eventEditForm = null;
   #eventComponent = null;
   #eventListComponent = null;
-
   #handleEventChange = null;
   #handleModeViewChange = null;
-
   #eventData = null;
   #eventsModel = null;
+
   #modeView = Mode.DEFAULT;
 
   constructor({ eventListComponent, onDataChange, onModeViewChange, eventsModel }) {
@@ -36,7 +35,8 @@ export default class EventPresenter {
       offersByType: this.#eventsModel.getOfferByType(eventData.type),
       offersTypes: this.#eventsModel.getOffersTypes(),
       onSubmit: () => this.#handleFormSubmit(),
-      onClose: () => this.#handleFormClose()
+      onClose: () => this.#handleFormClose(),
+      onDelete: () => this.#handleDeleteClick(eventData)
     });
 
     this.#eventComponent = new EventItemView({
@@ -80,6 +80,14 @@ export default class EventPresenter {
       UserAction.UPDATE_EVENT,
       UpdateType.PATCH,
       {...this.#eventData, isFavorite: !this.#eventData.isFavorite}
+    );
+  }
+
+  #handleDeleteClick(event) {
+    this.#handleEventChange(
+      UserAction.DELETE_EVENT,
+      UpdateType.MINOR,
+      event
     );
   }
 
