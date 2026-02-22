@@ -4,6 +4,7 @@ import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import { DateFormat } from '../../constants/const.js';
 
+
 export default class EditFormView extends AbstractStatefulView{
   #handleFormSubmit = null;
   #closeHandler = null;
@@ -60,7 +61,13 @@ export default class EditFormView extends AbstractStatefulView{
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this.#handleFormSubmit(EditFormView.parseStateToEvent(this._state));
+    const parsedEvent = EditFormView.parseStateToEvent(this._state);
+    this.#handleFormSubmit(parsedEvent);
+  };
+
+ #deleteHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleDeleteClick(EditFormView.parseStateToEvent(this._state));
   };
 
   #editRollUpHandler = (evt) => {
@@ -91,15 +98,10 @@ export default class EditFormView extends AbstractStatefulView{
 
   #priceChangeHandler = (evt) => {
     evt.preventDefault();
-    const newPrice = evt.target.value;
-    this._setState({
+    const newPrice = Number(evt.target.value);
+    this.updateElement({
       basePrice: newPrice
     });
-  };
-
-  #deleteHandler = (evt) => {
-    evt.preventDefault();
-    this.#handleDeleteClick(this.#originalState);
   };
 
   #dateFromChangeHandler = ([userDate]) => {
@@ -123,7 +125,8 @@ export default class EditFormView extends AbstractStatefulView{
         'time_24hr': true,
         defaultDate: this._state.dateFrom,
         onChange: this.#dateFromChangeHandler,
-        maxDate: this._state.dateTo,
+        maxDate:this._state.dateTo
+
       }
     );
   }
@@ -165,8 +168,9 @@ export default class EditFormView extends AbstractStatefulView{
 
   static parseStateToEvent(state) {
     const event = {...state};
-    delete event.allOffersType;
 
+
+    delete event.allOffersType;
     return event;
   }
 }

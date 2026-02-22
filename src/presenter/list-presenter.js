@@ -6,21 +6,21 @@ import { Filter, FilterType } from '../constants/filter-const.js';
 import SortView from '../view/sort-view/sort-view.js';
 import EventListView from '../view/event-list-view/event-list-view.js';
 import EmptyList from '../view/list-empty-view/list-empty-view.js';
-import EventPresenter from './event-presenter.js';
+import EventPresenter from './event-presenter.js';;
 
 export default class ListPresenter {
   #container = null;
   #eventsModel = null;
   #filterModel = null;
   #sortComponent = null;
-  #eventListComponent = null;
   #emptyListComponent = null;
 
   #eventPresenters = new Map();
+  #eventListComponent = new EventListView();
   #currentSortType = SortType.DAY;
   #filterType = FilterType.EVERYTHING;
 
-  constructor({ container, eventsModel, filterModel }) {
+  constructor({ container, eventsModel, filterModel}) {
     this.#container = container;
     this.#eventsModel = eventsModel;
     this.#filterModel = filterModel;
@@ -40,6 +40,11 @@ export default class ListPresenter {
 
   init() {
     this.#render();
+  }
+
+  createEvent() {
+    this.#currentSortType = SortType.DAY;
+    this.#filterModel.setFilter(FilterType.EVERYTHING);
   }
 
   #render() {
@@ -85,7 +90,6 @@ export default class ListPresenter {
   }
 
   #renderEventListComponent() {
-    this.#eventListComponent = new EventListView();
     render(this.#eventListComponent, this.#container);
   }
 

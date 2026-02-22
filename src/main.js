@@ -5,15 +5,18 @@ import MainPresenter from './presenter/main-presenter.js';
 
 const filtersContainer = document.querySelector('.trip-controls__filters');
 const eventsContainer = document.querySelector('.trip-events');
+const headerContainer = document.querySelector('.trip-main');
 
 const eventsModel = new EventsModel();
-const filterModel = new FilterModel(eventsModel.events);
+const filterModel = new FilterModel();
 
 const mainPresenter = new MainPresenter({
   filterModel,
   eventsModel,
-  eventsContainer
+  eventsContainer,
+  headerContainer
 });
+
 const filtersPresenter = new FiltersPresenter({
   filterModel,
   eventsModel,

@@ -35,20 +35,22 @@ export default class EventsModel extends Observable {
   }
 
   updateEvent(updateType, update) {
-    const index = this.events.findIndex((task) => task.id === update.id);
 
-    if (index === -1) {
-      throw new Error('Can\'t update unexisting task');
-    }
+  const index = this.events.findIndex((task) => task.id === update.id);
 
-    this.events = [
-      ...this.#events.slice(0, index),
-      update,
-      ...this.#events.slice(index + 1),
-    ];
-
-    this._notify(updateType, update);
+  if (index === -1) {
+    throw new Error('Can\'t update unexisting task');
   }
+
+
+  this.events = [
+    ...this.#events.slice(0, index),
+    update,
+    ...this.#events.slice(index + 1),
+  ];
+
+  this._notify(updateType, update);
+}
 
   addEvent(updateType, update) {
     this.events = [
@@ -93,6 +95,19 @@ export default class EventsModel extends Observable {
   }
 
   getEventDetails(event) {
+    const areOffersObjects = Array.isArray(event.offers) &&
+                            typeof event.offers[0] === 'object';
+    const isDestinationObject = typeof event.destination === 'object' &&
+                                event.destination !== null;
+
+    if (isDestinationObject && areOffersObjects) {
+      return {...event};
+    }
+
+    if (isDestinationObject && !areOffersObjects) {
+      return {...event, offers: this.getOffersForId(event)};
+    }
+
     const destination = this.getDestinationById(event.destination);
     const offers = this.getOffersForId(event);
     return {...event, offers, destination};

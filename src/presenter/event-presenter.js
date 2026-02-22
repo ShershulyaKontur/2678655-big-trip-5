@@ -3,6 +3,7 @@ import EventItemView from '../view/event-item-view/event-item-view.js';
 import EditFormView from '../view/form-view/edit-form-view.js';
 import { ESC_KEY, Mode } from '../constants/const.js';
 import { UpdateType, UserAction } from '../constants/const.js';
+import { isDatesEqual } from '../utils/utils.js';
 
 export default class EventPresenter {
   #eventEditForm = null;
@@ -28,15 +29,16 @@ export default class EventPresenter {
     const prevEventComponent = this.#eventComponent;
     const prevEventEditForm = this.#eventEditForm;
 
+
     this.#eventEditForm = new EditFormView({
       eventData,
+      onSubmit: (updatedEvent) => this.#handleFormSubmit(updatedEvent),
+      onClose: () => this.#handleFormClose(),
+      onDelete: () => this.#handleDeleteClick(eventData),
       allDestinations: this.#eventsModel.destinations,
       allOffers: this.#eventsModel.offers,
       offersByType: this.#eventsModel.getOfferByType(eventData.type),
       offersTypes: this.#eventsModel.getOffersTypes(),
-      onSubmit: () => this.#handleFormSubmit(),
-      onClose: () => this.#handleFormClose(),
-      onDelete: () => this.#handleDeleteClick(eventData)
     });
 
     this.#eventComponent = new EventItemView({
@@ -112,7 +114,17 @@ export default class EventPresenter {
     }
   };
 
-  #handleFormSubmit() {
+  #handleFormSubmit(update) {
+
+    const isMinorUpdate =
+      !isDatesEqual(this.#eventData.dateFrom, update.dateFrom) ||
+      this.#eventData.basePrice !== update.basePrice;
+
+    this.#handleEventChange(
+      UserAction.UPDATE_EVENT,
+      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+      update
+    );
     this.#replaceFormToEvent();
   }
 
