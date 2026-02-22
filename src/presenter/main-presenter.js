@@ -1,19 +1,22 @@
 import ListPresenter from './list-presenter.js';
 
 export default class MainPresenter {
-  #model = null;
+  #eventsModel = null;
+  #filterModel = null;
   #eventsContainer = null;
   #listPresenter = null;
 
-  constructor({ model, eventsContainer }) {
-    this.#model = model;
+  constructor({ eventsModel, eventsContainer, filterModel }) {
+    this.#eventsModel = eventsModel;
+    this.#filterModel = filterModel;
     this.#eventsContainer = eventsContainer;
   }
 
   init() {
     this.#listPresenter = new ListPresenter({
       container: this.#eventsContainer,
-      model: this.#model
+      eventsModel: this.#eventsModel,
+      filterModel: this.#filterModel,
     });
     this.#listPresenter.init();
   }

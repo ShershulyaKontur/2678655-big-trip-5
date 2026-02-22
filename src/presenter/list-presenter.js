@@ -2,6 +2,7 @@ import { render, replace, remove } from '../framework/render.js';
 import { SortType } from '../constants/sort-const.js';
 import { SortFns } from '../constants/sort-const.js';
 import { UpdateType, UserAction } from '../constants/const.js';
+import { Filter } from '../constants/filter-const.js';
 import SortView from '../view/sort-view/sort-view.js';
 import EventListView from '../view/event-list-view/event-list-view.js';
 import EmptyList from '../view/list-empty-view/list-empty-view.js';
@@ -9,7 +10,8 @@ import EventPresenter from './event-presenter.js';
 
 export default class ListPresenter {
   #container = null;
-  #model = null;
+  #eventsModel = null;
+  #filterModel = null;
   #sortComponent = null;
   #eventListComponent = null;
   #emptyListComponent = null;
@@ -17,16 +19,23 @@ export default class ListPresenter {
   #eventPresenters = new Map();
   #currentSortType = SortType.DAY;
 
-  constructor({ container, model }) {
+  constructor({ container, eventsModel, filterModel }) {
     this.#container = container;
-    this.#model = model;
+    this.#eventsModel = eventsModel;
+    this.#filterModel = filterModel;
 
-    this.#model.addObserver(this.#handleModelEvent);
+    this.#eventsModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   get events() {
-    return [...this.#model.fullEvents].sort(SortFns[this.#currentSortType]);
+    const filterType = this.#filterModel.filter;
+    const events = this.#eventsModel.fullEvents;
+    const filteredEvents = Filter[filterType](events);
+
+    return [...filteredEvents].sort(SortFns[this.#currentSortType]);
   }
+
 
   init() {
     this.#render();
@@ -48,6 +57,8 @@ export default class ListPresenter {
 
     remove(this.#emptyListComponent);
     remove(this.#eventListComponent);
+    remove(this.#sortComponent);
+    this.#sortComponent = null;
 
     if (resetSortType) {
       this.#currentSortType = SortType.DAY;
@@ -80,7 +91,7 @@ export default class ListPresenter {
 
   #renderEvent(event) {
     const eventPresenter = new EventPresenter({
-      model: this.#model,
+      eventsModel: this.#eventsModel,
       eventListComponent: this.#eventListComponent.element,
       onDataChange: this.#handleViewAction,
       onModeViewChange: this.#handleModeViewChange
@@ -126,7 +137,7 @@ export default class ListPresenter {
     switch (updateType) {
       case UpdateType.PATCH:
         this.#eventPresenters.get(data.id).init(data);
-        break
+        break;
       case UpdateType.MINOR:
         this.#clearList();
         this.#render();
@@ -141,13 +152,13 @@ export default class ListPresenter {
   #handleViewAction = (actionType, updateType, update) => {
     switch (actionType) {
       case UserAction.UPDATE_EVENT:
-        this.#model.updateEvent(updateType, update);
+        this.#eventsModel.updateEvent(updateType, update);
         break;
       case UserAction.ADD_EVENT:
-        this.#model.addEvent(updateType, update);
+        this.#eventsModel.addEvent(updateType, update);
         break;
       case UserAction.DELETE_EVENT:
-        this.#model.deleteEvent(updateType, update);
+        this.#eventsModel.deleteEvent(updateType, update);
         break;
     }
   };

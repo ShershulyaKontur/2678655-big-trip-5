@@ -13,14 +13,14 @@ export default class EventPresenter {
   #handleModeViewChange = null;
 
   #eventData = null;
-  #model = null;
+  #eventsModel = null;
   #modeView = Mode.DEFAULT;
 
-  constructor({ eventListComponent, onDataChange, onModeViewChange, model }) {
+  constructor({ eventListComponent, onDataChange, onModeViewChange, eventsModel }) {
     this.#eventListComponent = eventListComponent;
     this.#handleEventChange = onDataChange;
     this.#handleModeViewChange = onModeViewChange;
-    this.#model = model;
+    this.#eventsModel = eventsModel;
   }
 
   init(eventData) {
@@ -31,10 +31,10 @@ export default class EventPresenter {
 
     this.#eventEditForm = new EditFormView({
       eventData,
-      allDestinations: this.#model.destinations,
-      allOffers: this.#model.offers,
-      offersByType: this.#model.getOfferByType(eventData.type),
-      offersTypes: this.#model.getOffersTypes(),
+      allDestinations: this.#eventsModel.destinations,
+      allOffers: this.#eventsModel.offers,
+      offersByType: this.#eventsModel.getOfferByType(eventData.type),
+      offersTypes: this.#eventsModel.getOffersTypes(),
       onSubmit: () => this.#handleFormSubmit(),
       onClose: () => this.#handleFormClose()
     });

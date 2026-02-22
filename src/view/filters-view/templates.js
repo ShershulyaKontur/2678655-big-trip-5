@@ -1,9 +1,8 @@
-import { FilterType } from '../../constants/filter-const.js';
 import { capitalizeFirstLetter } from '../../utils/utils.js';
 
-function createFiltersItemTemplate({ type, count }) {
+function createFiltersItemTemplate(filter, currentFilterType) {
+  const { type, count } = filter;
   const label = capitalizeFirstLetter(type);
-
   return `<div class="trip-filters__filter">
             <input
               id="filter-${type}"
@@ -11,16 +10,16 @@ function createFiltersItemTemplate({ type, count }) {
               type="radio"
               name="trip-filter"
               value="${type}"
-              ${type === FilterType.EVERYTHING ? 'checked' : ''}
+              ${type === currentFilterType ? 'checked' : ''}
               ${count === 0 ? 'disabled' : ''}
             >
             <label class="trip-filters__filter-label" for="filter-${type}">${label}</label>
           </div>`;
 }
 
-export function createFiltersTemplate(filters) {
+export function createFiltersTemplate(filters, currentFilterType) {
   return `<form class="trip-filters" action="#" method="get">
-            ${filters.map(createFiltersItemTemplate).join('')}
+            ${filters.map((filter) => createFiltersItemTemplate(filter, currentFilterType)).join('')}
             <button class="visually-hidden" type="submit">Accept filter</button>
           </form>`;
 }

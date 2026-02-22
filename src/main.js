@@ -1,19 +1,22 @@
-import { generateFilters } from './mock/filters.js';
-import Model from './model/model.js';
+import EventsModel from './model/events-model.js';
+import FilterModel from './model/filter-model.js';
 import FiltersPresenter from './presenter/filters-presenter.js';
 import MainPresenter from './presenter/main-presenter.js';
 
 const filtersContainer = document.querySelector('.trip-controls__filters');
 const eventsContainer = document.querySelector('.trip-events');
 
-const model = new Model();
-const filterData = generateFilters(model.events);
+const eventsModel = new EventsModel();
+const filterModel = new FilterModel(eventsModel.events);
+
 const mainPresenter = new MainPresenter({
-  model,
+  filterModel,
+  eventsModel,
   eventsContainer
 });
 const filtersPresenter = new FiltersPresenter({
-  filterData,
+  filterModel,
+  eventsModel,
   filtersContainer
 });
 

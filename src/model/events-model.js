@@ -1,7 +1,7 @@
 import { getDestinations, getOffers, getEvents } from '../mock/mock-utils.js';
 import Observable from '../framework/observable.js';
 
-export default class Model extends Observable {
+export default class EventsModel extends Observable {
   #events = null;
   #offers = null;
   #destinations = null;
