@@ -19,16 +19,16 @@ export const mockEvents = [
     offers: [1, 3],
     type: 'taxi'
   },
-  {
-    id: 3,
-    basePrice: 1200,
-    dateFrom: 'February 22, 2026 09:00:00',
-    dateTo: 'February 22, 2026 18:00:00',
-    destination: 3,
-    isFavorite: false,
-    offers: [7, 8, 9],
-    type: 'train'
-  },
+  // {
+  //   id: 3,
+  //   basePrice: 1200,
+  //   dateFrom: 'February 22, 2026 09:00:00',
+  //   dateTo: 'February 22, 2026 18:00:00',
+  //   destination: 3,
+  //   isFavorite: false,
+  //   offers: [7, 8, 9],
+  //   type: 'train'
+  // },
   {
     id: 4,
     basePrice: 500,

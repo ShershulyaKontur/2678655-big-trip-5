@@ -1,7 +1,6 @@
 import { capitalizeFirstLetter } from '../../utils/utils.js';
 
-function createFiltersItemTemplate(filter, currentFilterType) {
-  const { type, count } = filter;
+function createFiltersItemTemplate({type}, currentFilterType) {
   const label = capitalizeFirstLetter(type);
   return `<div class="trip-filters__filter">
             <input
@@ -10,9 +9,7 @@ function createFiltersItemTemplate(filter, currentFilterType) {
               type="radio"
               name="trip-filter"
               value="${type}"
-              ${type === currentFilterType ? 'checked' : ''}
-              ${count === 0 ? 'disabled' : ''}
-            >
+              ${type === currentFilterType ? 'checked' : ''}>
             <label class="trip-filters__filter-label" for="filter-${type}">${label}</label>
           </div>`;
 }

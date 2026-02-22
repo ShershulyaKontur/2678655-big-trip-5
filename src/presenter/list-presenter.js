@@ -2,7 +2,7 @@ import { render, replace, remove } from '../framework/render.js';
 import { SortType } from '../constants/sort-const.js';
 import { SortFns } from '../constants/sort-const.js';
 import { UpdateType, UserAction } from '../constants/const.js';
-import { Filter } from '../constants/filter-const.js';
+import { Filter, FilterType } from '../constants/filter-const.js';
 import SortView from '../view/sort-view/sort-view.js';
 import EventListView from '../view/event-list-view/event-list-view.js';
 import EmptyList from '../view/list-empty-view/list-empty-view.js';
@@ -18,6 +18,7 @@ export default class ListPresenter {
 
   #eventPresenters = new Map();
   #currentSortType = SortType.DAY;
+  #filterType = FilterType.EVERYTHING;
 
   constructor({ container, eventsModel, filterModel }) {
     this.#container = container;
@@ -29,9 +30,9 @@ export default class ListPresenter {
   }
 
   get events() {
-    const filterType = this.#filterModel.filter;
+    this.#filterType = this.#filterModel.filter;
     const events = this.#eventsModel.fullEvents;
-    const filteredEvents = Filter[filterType](events);
+    const filteredEvents = Filter[this.#filterType](events);
 
     return [...filteredEvents].sort(SortFns[this.#currentSortType]);
   }
@@ -58,7 +59,6 @@ export default class ListPresenter {
     remove(this.#emptyListComponent);
     remove(this.#eventListComponent);
     remove(this.#sortComponent);
-    this.#sortComponent = null;
 
     if (resetSortType) {
       this.#currentSortType = SortType.DAY;
@@ -110,7 +110,7 @@ export default class ListPresenter {
   }
 
   #renderEmptyList() {
-    this.#emptyListComponent = new EmptyList();
+    this.#emptyListComponent = new EmptyList({filterType: this.#filterType});
     render(this.#emptyListComponent, this.#container);
   }
 
