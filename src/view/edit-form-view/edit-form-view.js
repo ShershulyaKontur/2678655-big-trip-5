@@ -139,15 +139,18 @@ export default class EditFormView extends AbstractStatefulView{
   };
 
   #setDatepickers() {
+    const fromDateStr = dayjs.utc(this._state.dateFrom).format(DateFormat.FULL_DATE_FORMAT);
+    const toDateStr = dayjs.utc(this._state.dateTo).format(DateFormat.FULL_DATE_FORMAT);
+
     this.#datepickerFrom = flatpickr(
       this.element.querySelector('#event-start-time-1'),
       {
         dateFormat: DateFormat.FLATPICKR_FORMAT,
         enableTime: true,
         'time_24hr': true,
-        defaultDate: dayjs.utc(this._state.dateFrom),
+        defaultDate: fromDateStr,
         onChange: this.#dateFromChangeHandler,
-        maxDate: dayjs.utc(this._state.dateTo),
+        maxDate: toDateStr,
       }
     );
 
@@ -157,9 +160,9 @@ export default class EditFormView extends AbstractStatefulView{
         dateFormat: DateFormat.FLATPICKR_FORMAT,
         enableTime: true,
         'time_24hr': true,
-        defaultDate: dayjs.utc(this._state.dateTo),
+        defaultDate: toDateStr,
         onChange: this.#dateToChangeHandler,
-        minDate: dayjs.utc(this._state.dateFrom),
+        minDate: fromDateStr,
       }
     );
   }
