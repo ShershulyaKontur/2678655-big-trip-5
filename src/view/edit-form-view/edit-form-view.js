@@ -55,6 +55,10 @@ export default class EditFormView extends AbstractStatefulView{
     this.element.querySelector('.event__reset-btn')
       .addEventListener('click', this.#deleteHandler);
 
+    this.element.querySelectorAll('.event__offer-checkbox').forEach(checkbox => {
+      checkbox.addEventListener('change', this.#offerChangeHandler);
+    });
+
     this.#setDatepickerFrom();
     this.#setDatepickerTo();
   }
@@ -85,6 +89,20 @@ export default class EditFormView extends AbstractStatefulView{
       allOffersType: typeOffers.offers,
     });
   };
+  #offerChangeHandler = (evt) => {
+    const offerId = parseInt(evt.target.id.replace('event-offer-', ''), 10);
+    const isChecked = evt.target.checked;
+
+    const typeOffers = this.#allOffers.find((offer) => offer.type === this._state.type)?.offers || [];
+    const offerToToggle = typeOffers.find((offer) => offer.id === offerId);
+    if (!offerToToggle) return;
+
+    const updatedOffers = isChecked
+      ? [...this._state.offers, offerToToggle]
+      : this._state.offers.filter((offer) => offer.id !== offerId);
+
+    this._setState({ offers: updatedOffers });
+  };
 
   #destinationChangeHandler = (evt) => {
     evt.preventDefault();
@@ -99,7 +117,7 @@ export default class EditFormView extends AbstractStatefulView{
   #priceChangeHandler = (evt) => {
     evt.preventDefault();
     const newPrice = Number(evt.target.value);
-    this.updateElement({
+    this._setState({
       basePrice: newPrice
     });
   };

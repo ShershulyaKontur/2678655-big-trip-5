@@ -33,7 +33,7 @@ export default class MainPresenter {
     this.#listPresenter.init();
   }
 
-  #handleNewEventFormClose() {
+  #handleNewEventFormClose = () => {
     this.#newEventButtonComponent.element.disabled = false;
   }
 

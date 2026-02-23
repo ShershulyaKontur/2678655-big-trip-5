@@ -6,7 +6,9 @@ import { Filter, FilterType } from '../constants/filter-const.js';
 import SortView from '../view/sort-view/sort-view.js';
 import EventListView from '../view/event-list-view/event-list-view.js';
 import EmptyList from '../view/list-empty-view/list-empty-view.js';
-import EventPresenter from './event-presenter.js';;
+import EventPresenter from './event-presenter.js';
+import NewEventPresenter from './new-event-presenter.js';
+;
 
 export default class ListPresenter {
   #container = null;
@@ -14,27 +16,31 @@ export default class ListPresenter {
   #filterModel = null;
   #sortComponent = null;
   #emptyListComponent = null;
+  #newEventPresenter = null;
+  #onNewEventDestroy = null;
 
   #eventPresenters = new Map();
   #eventListComponent = new EventListView();
   #currentSortType = SortType.DAY;
   #filterType = FilterType.EVERYTHING;
 
-  constructor({ container, eventsModel, filterModel}) {
+  constructor({ container, eventsModel, filterModel, onNewEventDestroy}) {
     this.#container = container;
     this.#eventsModel = eventsModel;
     this.#filterModel = filterModel;
+    this.#onNewEventDestroy = onNewEventDestroy;
 
     this.#eventsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   get events() {
-    this.#filterType = this.#filterModel.filter;
+    const filterType = this.#filterModel.filter || FilterType.EVERYTHING;
     const events = this.#eventsModel.fullEvents;
-    const filteredEvents = Filter[this.#filterType](events);
+    const filterFunction = Filter[filterType];
+    console.log(filterFunction(events).sort(SortFns[this.#currentSortType]))
 
-    return [...filteredEvents].sort(SortFns[this.#currentSortType]);
+    return filterFunction(events).sort(SortFns[this.#currentSortType]);
   }
 
 
@@ -43,8 +49,21 @@ export default class ListPresenter {
   }
 
   createEvent() {
+    if (!this.#eventListComponent.element) {
+      this.#renderEventListComponent();
+    }
+
+    this.#newEventPresenter = new NewEventPresenter({
+      eventListContainer: this.#eventListComponent.element,
+      onDataChange: this.#handleViewAction,
+      onDestroy: this.#onNewEventDestroy,
+      eventsModel: this.#eventsModel
+
+    });
+
     this.#currentSortType = SortType.DAY;
     this.#filterModel.setFilter(FilterType.EVERYTHING);
+    this.#newEventPresenter.init();
   }
 
   #render() {
@@ -60,6 +79,11 @@ export default class ListPresenter {
 
   #clearList({ resetSortType = false } = {}) {
     this.#clearEvents();
+
+    if (this.#newEventPresenter) {
+      this.#newEventPresenter.destroy();
+      this.#newEventPresenter = null;
+    }
 
     remove(this.#emptyListComponent);
     remove(this.#eventListComponent);
@@ -134,7 +158,11 @@ export default class ListPresenter {
   };
 
   #handleModeViewChange = () => {
-    this.#eventPresenters.forEach((presenter) => presenter.resetView());
+  if (this.#newEventPresenter) {
+    this.#newEventPresenter.destroy();
+    this.#newEventPresenter = null;
+  }
+  this.#eventPresenters.forEach((presenter) => presenter.resetView());
   };
 
   #handleModelEvent = (updateType, data) => {

@@ -1,6 +1,6 @@
 import { render, replace, remove } from '../framework/render.js';
 import EventItemView from '../view/event-item-view/event-item-view.js';
-import EditFormView from '../view/form-view/edit-form-view.js';
+import EditFormView from '../view/edit-form-view/edit-form-view.js';
 import { ESC_KEY, Mode } from '../constants/const.js';
 import { UpdateType, UserAction } from '../constants/const.js';
 import { isDatesEqual } from '../utils/utils.js';
