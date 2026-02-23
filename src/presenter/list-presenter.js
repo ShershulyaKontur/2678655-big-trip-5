@@ -8,7 +8,6 @@ import EventListView from '../view/event-list-view/event-list-view.js';
 import EmptyList from '../view/list-empty-view/list-empty-view.js';
 import EventPresenter from './event-presenter.js';
 import NewEventPresenter from './new-event-presenter.js';
-;
 
 export default class ListPresenter {
   #container = null;
@@ -35,14 +34,12 @@ export default class ListPresenter {
   }
 
   get events() {
-    const filterType = this.#filterModel.filter || FilterType.EVERYTHING;
+    this.#filterType = this.#filterModel.filter;
     const events = this.#eventsModel.fullEvents;
-    const filterFunction = Filter[filterType];
-    console.log(filterFunction(events).sort(SortFns[this.#currentSortType]))
+    const filterFunction = Filter[this.#filterType];
 
     return filterFunction(events).sort(SortFns[this.#currentSortType]);
   }
-
 
   init() {
     this.#render();
@@ -53,16 +50,16 @@ export default class ListPresenter {
       this.#renderEventListComponent();
     }
 
+    this.#currentSortType = SortType.DAY;
+    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+
     this.#newEventPresenter = new NewEventPresenter({
       eventListContainer: this.#eventListComponent.element,
       onDataChange: this.#handleViewAction,
       onDestroy: this.#onNewEventDestroy,
       eventsModel: this.#eventsModel
-
     });
 
-    this.#currentSortType = SortType.DAY;
-    this.#filterModel.setFilter(FilterType.EVERYTHING);
     this.#newEventPresenter.init();
   }
 
@@ -132,7 +129,7 @@ export default class ListPresenter {
     this.events.forEach((event) => this.#renderEvent(event));
   }
 
-  #clearEvents(){
+  #clearEvents() {
     this.#eventPresenters.forEach((presenter) => presenter.destroy());
     this.#eventPresenters.clear();
   }
@@ -158,11 +155,11 @@ export default class ListPresenter {
   };
 
   #handleModeViewChange = () => {
-  if (this.#newEventPresenter) {
-    this.#newEventPresenter.destroy();
-    this.#newEventPresenter = null;
-  }
-  this.#eventPresenters.forEach((presenter) => presenter.resetView());
+    if (this.#newEventPresenter) {
+      this.#newEventPresenter.destroy();
+      this.#newEventPresenter = null;
+    }
+    this.#eventPresenters.forEach((presenter) => presenter.resetView());
   };
 
   #handleModelEvent = (updateType, data) => {

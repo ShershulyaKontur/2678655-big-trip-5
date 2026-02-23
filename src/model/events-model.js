@@ -35,22 +35,20 @@ export default class EventsModel extends Observable {
   }
 
   updateEvent(updateType, update) {
+    const index = this.events.findIndex((task) => task.id === update.id);
 
-  const index = this.events.findIndex((task) => task.id === update.id);
+    if (index === -1) {
+      throw new Error('Can\'t update unexisting task');
+    }
 
-  if (index === -1) {
-    throw new Error('Can\'t update unexisting task');
+    this.events = [
+      ...this.#events.slice(0, index),
+      update,
+      ...this.#events.slice(index + 1),
+    ];
+
+    this._notify(updateType, update);
   }
-
-
-  this.events = [
-    ...this.#events.slice(0, index),
-    update,
-    ...this.#events.slice(index + 1),
-  ];
-
-  this._notify(updateType, update);
-}
 
   addEvent(updateType, update) {
     this.events = [

@@ -10,7 +10,7 @@ export default class MainPresenter {
   #listPresenter = null;
   #newEventButtonComponent = null;
 
-  constructor({ eventsModel, eventsContainer, headerContainer,  filterModel }) {
+  constructor({ eventsModel, eventsContainer, headerContainer, filterModel }) {
     this.#eventsModel = eventsModel;
     this.#filterModel = filterModel;
     this.#eventsContainer = eventsContainer;
@@ -20,7 +20,7 @@ export default class MainPresenter {
   init() {
     this.#newEventButtonComponent = new NewEventButtonView({
       onClick: this.#handleNewEventButtonClick
-    })
+    });
 
     this.#listPresenter = new ListPresenter({
       container: this.#eventsContainer,
@@ -35,11 +35,11 @@ export default class MainPresenter {
 
   #handleNewEventFormClose = () => {
     this.#newEventButtonComponent.element.disabled = false;
-  }
+  };
 
   #handleNewEventButtonClick = () => {
     this.#listPresenter.createEvent();
     this.#newEventButtonComponent.element.disabled = true;
-  }
+  };
 
 }

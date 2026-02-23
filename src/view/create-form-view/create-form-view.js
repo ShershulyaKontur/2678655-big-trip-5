@@ -27,8 +27,8 @@ export default class CreateFormView extends AbstractStatefulView {
     return {
       type: 'flight',
       basePrice: '1111',
-      dateFrom:'',
-      dateTo: '',
+      dateFrom:'2026-02-23T10:24:00Z',
+      dateTo: '2026-02-23T11:24:00Z',
       destination: {
         id: 3,
         description: 'NSK - with a beautiful old town',
@@ -64,8 +64,7 @@ export default class CreateFormView extends AbstractStatefulView {
     this.element.querySelector('.event__input--price')
       .addEventListener('input', this.#priceChangeHandler);
 
-
-    this.element.querySelectorAll('.event__offer-checkbox').forEach(checkbox => {
+    this.element.querySelectorAll('.event__offer-checkbox').forEach((checkbox) => {
       checkbox.addEventListener('change', this.#offerChangeHandler);
     });
 
@@ -77,8 +76,8 @@ export default class CreateFormView extends AbstractStatefulView {
     const newEvent = {
       type: this._state.type,
       basePrice: Number(this._state.basePrice) || 0,
-      dateFrom: this._state.dateFrom.toISOString(),
-      dateTo: this._state.dateTo.toISOString(),
+      dateFrom: this._state.dateFrom,
+      dateTo: this._state.dateTo,
       destination: this._state.destination,
       offers: this._state.offers,
       isFavorite: false
@@ -127,16 +126,15 @@ export default class CreateFormView extends AbstractStatefulView {
     const isChecked = evt.target.checked;
 
     const typeOffers = this.#allOffers.find((offer) => offer.type === this._state.type)?.offers || [];
-    let updatedOffers = [...this._state.offers];
 
     const offerToToggle = typeOffers.find((offer) => offer.id === offerId);
-    if (!offerToToggle) return;
-
-    if (isChecked) {
-      updatedOffers.push(offerToToggle);
-    } else {
-      updatedOffers = updatedOffers.filter((offer) => offer.id !== offerId);
+    if (!offerToToggle) {
+      return;
     }
+
+    const updatedOffers = isChecked
+      ? [...this._state.offers, offerToToggle]
+      : this._state.offers.filter((offer) => offer.id !== offerId);
 
     this.updateElement({ offers: updatedOffers });
   };
@@ -160,7 +158,7 @@ export default class CreateFormView extends AbstractStatefulView {
       {
         dateFormat: DateFormat.FLATPICKR_FORMAT,
         enableTime: true,
-        time_24hr: true,
+        'time_24hr': true,
         defaultDate: this._state.dateFrom,
         onChange: this.#dateFromChangeHandler,
       }
@@ -171,7 +169,7 @@ export default class CreateFormView extends AbstractStatefulView {
       {
         dateFormat: DateFormat.FLATPICKR_FORMAT,
         enableTime: true,
-        time_24hr: true,
+        'time_24hr': true,
         defaultDate: this._state.dateTo,
         onChange: this.#dateToChangeHandler,
       }

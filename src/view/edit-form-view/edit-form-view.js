@@ -55,7 +55,7 @@ export default class EditFormView extends AbstractStatefulView{
     this.element.querySelector('.event__reset-btn')
       .addEventListener('click', this.#deleteHandler);
 
-    this.element.querySelectorAll('.event__offer-checkbox').forEach(checkbox => {
+    this.element.querySelectorAll('.event__offer-checkbox').forEach((checkbox) => {
       checkbox.addEventListener('change', this.#offerChangeHandler);
     });
 
@@ -69,7 +69,7 @@ export default class EditFormView extends AbstractStatefulView{
     this.#handleFormSubmit(parsedEvent);
   };
 
- #deleteHandler = (evt) => {
+  #deleteHandler = (evt) => {
     evt.preventDefault();
     this.#handleDeleteClick(EditFormView.parseStateToEvent(this._state));
   };
@@ -89,13 +89,17 @@ export default class EditFormView extends AbstractStatefulView{
       allOffersType: typeOffers.offers,
     });
   };
+
   #offerChangeHandler = (evt) => {
     const offerId = parseInt(evt.target.id.replace('event-offer-', ''), 10);
     const isChecked = evt.target.checked;
 
     const typeOffers = this.#allOffers.find((offer) => offer.type === this._state.type)?.offers || [];
     const offerToToggle = typeOffers.find((offer) => offer.id === offerId);
-    if (!offerToToggle) return;
+
+    if (!offerToToggle) {
+      return;
+    }
 
     const updatedOffers = isChecked
       ? [...this._state.offers, offerToToggle]

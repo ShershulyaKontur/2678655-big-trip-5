@@ -1,11 +1,11 @@
-import { DateFormat } from "../../constants/const";
-import { humanizePointDueDate } from "../../utils/formatter";
+import { DateFormat } from '../../constants/const';
+import { EVENT_TYPE } from '../../constants/mock-const';
+import { humanizePointDueDate } from '../../utils/formatter';
 
 export function createFormCreateTemplate(state, allDestinations, allOffers) {
   const { type, offers, destination, basePrice, dateFrom, dateTo } = state;
 
-  // Получаем offers для текущего типа
-  const typeOffers = allOffers.find(o => o.type === type)?.offers || [];
+  const typeOffers = allOffers.find((item) => item.type === type)?.offers || [];
 
   const startDay = humanizePointDueDate(dateFrom, DateFormat.FULL_DATE_FORMAT);
   const endDay = humanizePointDueDate(dateTo, DateFormat.FULL_DATE_FORMAT);
@@ -22,20 +22,19 @@ export function createFormCreateTemplate(state, allDestinations, allOffers) {
         <div class="event__type-list">
           <fieldset class="event__type-group">
             <legend class="visually-hidden">Event type</legend>
-            ${['taxi', 'bus', 'train', 'ship', 'drive', 'flight', 'check-in', 'sightseeing', 'restaurant']
-              .map((typeOption, index) => `
-                <div class="event__type-item">
-                  <input id="event-type-${typeOption}-1"
-                         class="event__type-input visually-hidden"
-                         type="radio"
-                         name="event-type"
-                         value="${typeOption}"
-                         ${typeOption === type ? 'checked' : ''}>
-                  <label class="event__type-label event__type-label--${typeOption}"
-                         for="event-type-${typeOption}-1">
-                    ${typeOption.charAt(0).toUpperCase() + typeOption.slice(1)}
-                  </label>
-                </div>
+            ${EVENT_TYPE.map((typeOption) => `
+            <div class="event__type-item">
+              <input id="event-type-${typeOption}-1"
+                class="event__type-input visually-hidden"
+                type="radio"
+                name="event-type"
+                value="${typeOption}"
+                ${typeOption === type ? 'checked' : ''}>
+              <label class="event__type-label event__type-label--${typeOption}"
+                for="event-type-${typeOption}-1">
+                ${typeOption.charAt(0).toUpperCase() + typeOption.slice(1)}
+              </label>
+            </div>
               `).join('')}
           </fieldset>
         </div>
@@ -46,13 +45,13 @@ export function createFormCreateTemplate(state, allDestinations, allOffers) {
           ${type}
         </label>
         <input class="event__input event__input--destination"
-               id="event-destination-1"
-               type="text"
-               name="event-destination"
-               value="${destination.name || ''}"
-               list="destination-list-1">
+          id="event-destination-1"
+          type="text"
+          name="event-destination"
+          value="${destination.name || ''}"
+          list="destination-list-1">
         <datalist id="destination-list-1">
-          ${allDestinations.map(dest => `<option value="${dest.name}"></option>`).join('')}
+          ${allDestinations.map((dest) => `<option value="${dest.name}"></option>`).join('')}
         </datalist>
       </div>
 
@@ -78,10 +77,10 @@ export function createFormCreateTemplate(state, allDestinations, allOffers) {
           &euro;
         </label>
         <input class="event__input event__input--price"
-               id="event-price-1"
-               type="text"
-               name="event-price"
-               value="${basePrice}">
+          id="event-price-1"
+          type="text"
+          name="event-price"
+          value="${basePrice}">
       </div>
 
       <button class="event__save-btn btn btn--blue" type="submit">Save</button>
@@ -93,17 +92,18 @@ export function createFormCreateTemplate(state, allDestinations, allOffers) {
         <section class="event__section event__section--offers">
           <h3 class="event__section-title event__section-title--offers">Offers</h3>
           <div class="event__available-offers">
-            ${typeOffers.map(offer => `
+            ${typeOffers.map((offerItem) => `
               <div class="event__offer-selector">
                 <input class="event__offer-checkbox visually-hidden"
-                       id="event-offer-${offer.id}"
-                       type="checkbox"
-                       name="event-offer-${offer.id}"
-                       ${offers.some(o => o.id === offer.id) ? 'checked' : ''}>
-                <label class="event__offer-label" for="event-offer-${offer.id}">
-                  <span class="event__offer-title">${offer.title}</span>
+                  id="event-offer-${offerItem.id}"
+                  type="checkbox"
+                  name="event-offer-${offerItem.id}"
+                  ${offers.some((offer) => offer.id === offerItem.id) ? 'checked' : ''}
+                >
+                <label class="event__offer-label" for="event-offer-${offerItem.id}">
+                  <span class="event__offer-title">${offerItem.title}</span>
                   &plus;&euro;&nbsp;
-                  <span class="event__offer-price">${offer.price}</span>
+                  <span class="event__offer-price">${offerItem.price}</span>
                 </label>
               </div>
             `).join('')}
@@ -117,8 +117,8 @@ export function createFormCreateTemplate(state, allDestinations, allOffers) {
         ${destination.pictures && destination.pictures.length > 0 ? `
           <div class="event__photos-container">
             <div class="event__photos-tape">
-              ${destination.pictures.map(pic => `
-                <img class="event__photo" src="${pic.src}" alt="${pic.description}">
+              ${destination.pictures.map((picture) => `
+                <img class="event__photo" src="${picture.src}" alt="${picture.description}">
               `).join('')}
             </div>
           </div>

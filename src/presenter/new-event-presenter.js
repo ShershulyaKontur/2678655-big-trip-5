@@ -15,13 +15,13 @@ export default class NewEventPresenter {
     this.#handleDataChange = onDataChange;
     this.#handleDestroy = onDestroy;
     this.#eventsModel = eventsModel;
-
   }
 
   init() {
     if (this.#eventCreateView !== null) {
       return;
     }
+
     this.#eventCreateView = new CreateFormView({
       onSubmit: this.#handleFormSubmit,
       onClose: this.#handleCancelClick,

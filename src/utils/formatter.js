@@ -5,8 +5,8 @@ import utc from 'dayjs/plugin/utc';
 dayjs.extend(utc);
 dayjs.extend(duration);
 
-export const humanizePointDueDate = (dueDate, dateFormat) => {
-  return dueDate ? dayjs.utc(dueDate).format(dateFormat) : '';
+export function humanizePointDueDate(dueDate, dateFormat){
+  return dayjs.utc(dueDate).format(dateFormat);
 }
 
 export function getDuration(startDate, endDate) {
