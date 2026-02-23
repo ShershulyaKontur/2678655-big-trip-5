@@ -3,6 +3,7 @@ import AbstractStatefulView from '../../framework/view/abstract-stateful-view.js
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import { DateFormat } from '../../constants/const.js';
+import dayjs from 'dayjs';
 
 
 export default class EditFormView extends AbstractStatefulView{
@@ -143,9 +144,10 @@ export default class EditFormView extends AbstractStatefulView{
       {
         dateFormat: DateFormat.FLATPICKR_FORMAT,
         enableTime: true,
-        'time_24hr': true,
-        defaultDate: this._state.dateFrom,
+        time_24hr: true,
+        defaultDate: dayjs.utc(this._state.dateFrom),
         onChange: this.#dateFromChangeHandler,
+        maxDate: dayjs.utc(this._state.dateTo),
       }
     );
 
@@ -154,12 +156,13 @@ export default class EditFormView extends AbstractStatefulView{
       {
         dateFormat: DateFormat.FLATPICKR_FORMAT,
         enableTime: true,
-        'time_24hr': true,
-        defaultDate: this._state.dateTo,
+        time_24hr: true,
+        defaultDate: dayjs.utc(this._state.dateTo),
         onChange: this.#dateToChangeHandler,
+        minDate: dayjs.utc(this._state.dateFrom),
       }
     );
-  }
+  };
 
   removeElement() {
     super.removeElement();
