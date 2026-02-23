@@ -1,6 +1,7 @@
 import { DateFormat } from '../../constants/const';
 import { EVENT_TYPE } from '../../constants/mock-const';
 import { humanizePointDueDate } from '../../utils/formatter';
+import he from 'he';
 
 export function createFormCreateTemplate(state, allDestinations, allOffers) {
   const { type, offers, destination, basePrice, dateFrom, dateTo } = state;
@@ -48,7 +49,7 @@ export function createFormCreateTemplate(state, allDestinations, allOffers) {
           id="event-destination-1"
           type="text"
           name="event-destination"
-          value="${destination.name || ''}"
+          value="${he.encode(destination.name)}"
           list="destination-list-1">
         <datalist id="destination-list-1">
           ${allDestinations.map((dest) => `<option value="${dest.name}"></option>`).join('')}

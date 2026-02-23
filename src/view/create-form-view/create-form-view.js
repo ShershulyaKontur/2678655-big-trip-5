@@ -36,7 +36,7 @@ export default class CreateFormView extends AbstractStatefulView {
         pictures: [
           {
             src: 'https://24.objects.htmlacademy.pro/static/destinations/18.jpg',
-            description: 'Rome a true asian pearl'
+            description: 'NSK a true asian pearl'
           },
 
         ]
@@ -55,12 +55,16 @@ export default class CreateFormView extends AbstractStatefulView {
 
   _restoreHandlers() {
     this.element.addEventListener('submit', this.#formSubmitHandler);
+
     this.element.querySelector('.event__reset-btn')
       .addEventListener('click', this.#cancelClickHandler);
+
     this.element.querySelector('.event__type-group')
       .addEventListener('change', this.#typeChangeHandler);
+
     this.element.querySelector('.event__input--destination')
       .addEventListener('change', this.#destinationChangeHandler);
+
     this.element.querySelector('.event__input--price')
       .addEventListener('input', this.#priceChangeHandler);
 
@@ -115,9 +119,11 @@ export default class CreateFormView extends AbstractStatefulView {
   };
 
   #priceChangeHandler = (evt) => {
-    evt.preventDefault();
+    const input = evt.target;
+    input.value = input.value.replace(/[^\d]/g, '');
+    const newPrice = Number(input.value) || '';
     this._setState({
-      basePrice: evt.target.value
+      basePrice: newPrice
     });
   };
 

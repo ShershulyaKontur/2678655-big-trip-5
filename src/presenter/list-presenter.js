@@ -74,7 +74,7 @@ export default class ListPresenter {
     this.#renderEvents();
   }
 
-  #clearList({ resetSortType = false } = {}) {
+  #clearList({resetSortType = false} = {}) {
     this.#clearEvents();
 
     if (this.#newEventPresenter) {

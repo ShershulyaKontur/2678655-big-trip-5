@@ -1,6 +1,7 @@
 import { DateFormat } from '../../constants/const.js';
 import { humanizePointDueDate } from '../../utils/formatter.js';
 import { capitalizeFirstLetter } from '../../utils/utils.js';
+import he from 'he';
 
 function createCountryOptionTemplate({name}) {
   return `<option value="${name}"></option>`;
@@ -64,7 +65,7 @@ export function createFormEditTemplate(state, destinationsData, offersTypes){
                 <label class="event__label  event__type-output" for="event-destination-1">
                   ${type}
                 </label>
-                <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${name}" list="destination-list-1">
+                <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(name)}" list="destination-list-1">
                 <datalist id="destination-list-1">
                   ${destinationsData.map((destination) => createCountryOptionTemplate(destination)).join('')}
                 </datalist>

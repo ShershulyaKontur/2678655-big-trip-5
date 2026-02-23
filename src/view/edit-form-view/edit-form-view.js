@@ -117,10 +117,10 @@ export default class EditFormView extends AbstractStatefulView{
     });
   };
 
-
   #priceChangeHandler = (evt) => {
-    evt.preventDefault();
-    const newPrice = Number(evt.target.value);
+    const input = evt.target;
+    input.value = input.value.replace(/[^\d]/g, '');
+    const newPrice = Number(input.value) || '';
     this._setState({
       basePrice: newPrice
     });

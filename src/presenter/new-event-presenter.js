@@ -1,7 +1,7 @@
 import { UpdateType, UserAction } from '../constants/const.js';
-import {remove, render, RenderPosition} from '../framework/render.js';
+import { remove, render, RenderPosition } from '../framework/render.js';
+import { nanoid } from 'nanoid';
 import CreateFormView from '../view/create-form-view/create-form-view.js';
-import {nanoid} from 'nanoid';
 
 export default class NewEventPresenter {
   #eventListContainer = null;
