@@ -143,7 +143,7 @@ export default class CreateFormView extends AbstractStatefulView {
       {
         dateFormat: DateFormat.FLATPICKR_FORMAT,
         enableTime: true,
-        time_24hr: true,
+        'time_24hr': true,
         defaultDate: dayjs.utc(this._state.dateFrom),
         onChange: this.#dateFromChangeHandler,
         maxDate: dayjs.utc(this._state.dateTo),
@@ -155,7 +155,7 @@ export default class CreateFormView extends AbstractStatefulView {
       {
         dateFormat: DateFormat.FLATPICKR_FORMAT,
         enableTime: true,
-        time_24hr: true,
+        'time_24hr': true,
         defaultDate: dayjs.utc(this._state.dateTo),
         onChange: this.#dateToChangeHandler,
         minDate: dayjs.utc(this._state.dateFrom),
