@@ -1,4 +1,4 @@
-import { UpdateType, UserAction } from '../constants/const.js';
+import { ESC_KEY, UpdateType, UserAction } from '../constants/const.js';
 import { remove, render, RenderPosition } from '../framework/render.js';
 import { nanoid } from 'nanoid';
 import CreateFormView from '../view/create-form-view/create-form-view.js';
@@ -28,7 +28,6 @@ export default class NewEventPresenter {
       allDestinations: this.#eventsModel.destinations,
       allOffers:this.#eventsModel.offers
     });
-
 
     render(this.#eventCreateView, this.#eventListContainer, RenderPosition.AFTERBEGIN);
     document.addEventListener('keydown', this.#escKeyDownHandler);
@@ -61,7 +60,7 @@ export default class NewEventPresenter {
   };
 
   #escKeyDownHandler = (evt) => {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
+    if (evt.key === ESC_KEY) {
       evt.preventDefault();
       this.destroy();
     }

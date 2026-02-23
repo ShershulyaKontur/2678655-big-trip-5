@@ -115,7 +115,6 @@ export default class EventPresenter {
   };
 
   #handleFormSubmit(update) {
-
     const isMinorUpdate =
       !isDatesEqual(this.#eventData.dateFrom, update.dateFrom) ||
       this.#eventData.basePrice !== update.basePrice;

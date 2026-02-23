@@ -59,8 +59,7 @@ export default class EditFormView extends AbstractStatefulView{
       checkbox.addEventListener('change', this.#offerChangeHandler);
     });
 
-    this.#setDatepickerFrom();
-    this.#setDatepickerTo();
+    this.#setDatepickers();
   }
 
   #formSubmitHandler = (evt) => {
@@ -138,7 +137,7 @@ export default class EditFormView extends AbstractStatefulView{
     });
   };
 
-  #setDatepickerFrom() {
+  #setDatepickers() {
     this.#datepickerFrom = flatpickr(
       this.element.querySelector('#event-start-time-1'),
       {
@@ -147,13 +146,9 @@ export default class EditFormView extends AbstractStatefulView{
         'time_24hr': true,
         defaultDate: this._state.dateFrom,
         onChange: this.#dateFromChangeHandler,
-        maxDate:this._state.dateTo
-
       }
     );
-  }
 
-  #setDatepickerTo() {
     this.#datepickerTo = flatpickr(
       this.element.querySelector('#event-end-time-1'),
       {
@@ -162,7 +157,6 @@ export default class EditFormView extends AbstractStatefulView{
         'time_24hr': true,
         defaultDate: this._state.dateTo,
         onChange: this.#dateToChangeHandler,
-        minDate: this._state.dateFrom,
       }
     );
   }

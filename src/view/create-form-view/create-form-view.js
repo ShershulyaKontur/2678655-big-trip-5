@@ -2,7 +2,7 @@ import { createFormCreateTemplate } from './templates.js';
 import AbstractStatefulView from '../../framework/view/abstract-stateful-view.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
-import { DateFormat } from '../../constants/const.js';
+import { DateFormat, DEFAULT_CREATE_STATE } from '../../constants/const.js';
 
 export default class CreateFormView extends AbstractStatefulView {
   #handleFormSubmit = null;
@@ -19,30 +19,8 @@ export default class CreateFormView extends AbstractStatefulView {
     this.#allDestinations = allDestinations;
     this.#allOffers = allOffers;
 
-    this._setState(this.#getDefaultState());
+    this._setState(DEFAULT_CREATE_STATE);
     this._restoreHandlers();
-  }
-
-  #getDefaultState() {
-    return {
-      type: 'flight',
-      basePrice: '1111',
-      dateFrom:'2026-02-23T10:24:00Z',
-      dateTo: '2026-02-23T11:24:00Z',
-      destination: {
-        id: 3,
-        description: 'NSK - with a beautiful old town',
-        name: 'NSK',
-        pictures: [
-          {
-            src: 'https://24.objects.htmlacademy.pro/static/destinations/18.jpg',
-            description: 'NSK a true asian pearl'
-          },
-
-        ]
-      },
-      offers: []
-    };
   }
 
   get template() {
@@ -50,7 +28,7 @@ export default class CreateFormView extends AbstractStatefulView {
   }
 
   reset() {
-    this.updateElement(this.#getDefaultState());
+    this.updateElement(DEFAULT_CREATE_STATE);
   }
 
   _restoreHandlers() {
