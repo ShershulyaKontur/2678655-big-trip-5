@@ -1,6 +1,8 @@
-import { render } from '../framework/render.js';
 import NewEventButtonView from '../view/new-event-button-view/new-event-button-view.js';
 import ListPresenter from './list-presenter.js';
+import { render } from '../framework/render.js';
+
+
 export default class MainPresenter {
   #eventsModel = null;
   #filterModel = null;

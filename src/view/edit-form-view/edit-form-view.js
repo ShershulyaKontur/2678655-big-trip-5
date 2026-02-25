@@ -1,37 +1,40 @@
 import { createFormEditTemplate } from './templates.js';
 import AbstractStatefulView from '../../framework/view/abstract-stateful-view.js';
+import dayjs from 'dayjs';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 import { DateFormat } from '../../constants/const.js';
-import dayjs from 'dayjs';
-
 
 export default class EditFormView extends AbstractStatefulView{
   #handleFormSubmit = null;
   #closeHandler = null;
   #allDestinations = [];
+  #destinationById = null;
   #allOffers = null;
   #offersTypes = null;
   #originalState = null;
   #datepickerFrom = null;
   #datepickerTo = null;
+  #allСities = null;
   #handleDeleteClick = null;
 
-  constructor({eventData, allOffers, offersByType, offersTypes, allDestinations, onSubmit, onClose, onDelete}){
+  constructor({event, allOffers, offersByType, offersTypes, allDestinations, destinationById, onSubmit, onClose, onDelete}){
     super();
     this.#allDestinations = allDestinations;
+    this.#allСities = this.#allDestinations.map((dest) => dest.name);
+    this.#destinationById = destinationById;
     this.#allOffers = allOffers;
     this.#offersTypes = offersTypes;
     this.#handleFormSubmit = onSubmit;
     this.#closeHandler = onClose;
     this.#handleDeleteClick = onDelete;
-    this.#originalState = structuredClone({...eventData});
-    this._setState(EditFormView.parseEventToState(eventData, offersByType));
+    this.#originalState = structuredClone({...event});
+    this._setState(EditFormView.parseEventToState(event, offersByType, destinationById));
     this._restoreHandlers();
   }
 
   get template() {
-    return createFormEditTemplate(this._state, this.#allDestinations, this.#offersTypes);
+    return createFormEditTemplate(this._state, this.#allСities, this.#offersTypes);
   }
 
   reset() {
@@ -60,23 +63,42 @@ export default class EditFormView extends AbstractStatefulView{
       checkbox.addEventListener('change', this.#offerChangeHandler);
     });
 
+    this.#updateSaveButtonState();
     this.#setDatepickers();
   }
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    const parsedEvent = EditFormView.parseStateToEvent(this._state);
-    this.#handleFormSubmit(parsedEvent);
+    this.#handleFormSubmit(EditFormView.parseStateToEvent(this._state));
   };
 
-  #deleteHandler = (evt) => {
-    evt.preventDefault();
-    this.#handleDeleteClick(EditFormView.parseStateToEvent(this._state));
+  #updateSaveButtonState = () => {
+    const saveButton = this.element.querySelector('.event__save-btn');
+    if (saveButton) {
+      saveButton.disabled = !this._state.isDestinationValid;
+    }
   };
 
   #editRollUpHandler = (evt) => {
     evt.preventDefault();
     this.#closeHandler();
+  };
+
+  #offerChangeHandler = (evt) => {
+    const offerId = parseInt(evt.target.id.replace('event-offer-', ''), 10);
+    const isChecked = evt.target.checked;
+    const typeOffers = this.#allOffers.find((offer) => offer.type === this._state.type)?.offers || [];
+    const offerToToggle = typeOffers.find((offer) => offer.id === offerId);
+
+    if (!offerToToggle) {
+      return;
+    }
+
+    const updatedOffers = isChecked
+      ? [...this._state.offers, offerId]
+      : this._state.offers.filter((id) => id !== offerId);
+
+    this._setState({ offers: updatedOffers });
   };
 
   #typeListChangeHandler = (evt) => {
@@ -86,44 +108,41 @@ export default class EditFormView extends AbstractStatefulView{
 
     this.updateElement({
       type: targetType,
-      allOffersType: typeOffers.offers,
+      allOffersType: typeOffers?.offers || [],
+      offers: []
     });
   };
 
-  #offerChangeHandler = (evt) => {
-    const offerId = parseInt(evt.target.id.replace('event-offer-', ''), 10);
-    const isChecked = evt.target.checked;
 
-    const typeOffers = this.#allOffers.find((offer) => offer.type === this._state.type)?.offers || [];
-    const offerToToggle = typeOffers.find((offer) => offer.id === offerId);
+  #destinationChangeHandler = (evt) => {
+    const inputValue = evt.target.value;
+    const newDestination = this.#allDestinations.find((item) => item.name === inputValue);
 
-    if (!offerToToggle) {
+    if (newDestination) {
+      this.updateElement({
+        destination: newDestination.id,
+        destinationById: newDestination,
+        isDestinationValid: true
+      });
       return;
     }
 
-    const updatedOffers = isChecked
-      ? [...this._state.offers, offerToToggle]
-      : this._state.offers.filter((offer) => offer.id !== offerId);
-
-    this._setState({ offers: updatedOffers });
-  };
-
-  #destinationChangeHandler = (evt) => {
-    evt.preventDefault();
-    const targetDestination = evt.target.value;
-    const newDestination = this.#allDestinations.find((item) => item.name === targetDestination);
     this.updateElement({
-      destination: newDestination
+      destination: null,
+      destinationById: {
+        name: inputValue,
+        description: '',
+        pictures: []
+      },
+      isDestinationValid: false
     });
+
   };
 
   #priceChangeHandler = (evt) => {
     const input = evt.target;
     input.value = input.value.replace(/[^\d]/g, '');
-    const newPrice = Number(input.value) || '';
-    this._setState({
-      basePrice: newPrice
-    });
+    this._setState({ basePrice: Number(input.value) || 0 });
   };
 
   #dateFromChangeHandler = ([userDate]) => {
@@ -181,19 +200,27 @@ export default class EditFormView extends AbstractStatefulView{
     }
   }
 
-  static parseEventToState(eventData, offersByType) {
+  #deleteHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleDeleteClick(EditFormView.parseStateToEvent(this._state));
+  };
+
+  static parseEventToState(event, offersByType, destinationById) {
     return {
-      ...eventData,
-      allOffersType: offersByType
+      ...event,
+      destinationById,
+      destination: event.destination,
+      allOffersType: offersByType,
+      isDestinationValid: true
     };
   }
 
   static parseStateToEvent(state) {
     const event = {...state};
-
-
     delete event.allOffersType;
+    delete event.destinationById;
+    delete event.isDestinationValid;
+
     return event;
   }
 }
-

@@ -39,17 +39,7 @@ export const DEFAULT_CREATE_STATE = {
   basePrice: '1111',
   dateFrom: '2026-02-23T10:24:00Z',
   dateTo: '2026-02-23T11:24:00Z',
-  destination: {
-    id: 3,
-    description: 'NSK - with a beautiful old town',
-    name: 'NSK',
-    pictures: [
-      {
-        src: 'https://24.objects.htmlacademy.pro/static/destinations/18.jpg',
-        description: 'NSK a true asian pearl'
-      },
-    ]
-  },
-  offers: []
+  destination: 3,
+  offers: [10, 11, 12]
 };
 

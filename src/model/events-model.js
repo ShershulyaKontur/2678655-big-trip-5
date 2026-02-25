@@ -17,10 +17,6 @@ export default class EventsModel extends Observable {
     return this.#events;
   }
 
-  get fullEvents(){
-    return this.events.map((event) => this.getEventDetails(event));
-  }
-
   set events(events) {
     this.#events = [...events];
     this._notify(events);
@@ -34,6 +30,11 @@ export default class EventsModel extends Observable {
     return this.#destinations;
   }
 
+  addEvent(updateType, update) {
+    this.events = [update, ...this.events];
+    this._notify(updateType, update);
+  }
+
   updateEvent(updateType, update) {
     const updatedEvents = this.events.map((event) =>
       event.id === update.id ? update : event
@@ -44,11 +45,6 @@ export default class EventsModel extends Observable {
     }
 
     this.events = updatedEvents;
-    this._notify(updateType, update);
-  }
-
-  addEvent(updateType, update) {
-    this.events = [update, ...this.events];
     this._notify(updateType, update);
   }
 
@@ -79,24 +75,5 @@ export default class EventsModel extends Observable {
 
   getOffersTypes(){
     return this.offers?.map((offer) => offer.type) ?? [];
-  }
-
-  getEventDetails(event) {
-    const areOffersObjects = Array.isArray(event.offers) &&
-                            typeof event.offers[0] === 'object';
-    const isDestinationObject = typeof event.destination === 'object' &&
-                                event.destination !== null;
-
-    if (isDestinationObject && areOffersObjects) {
-      return {...event};
-    }
-
-    if (isDestinationObject && !areOffersObjects) {
-      return {...event, offers: this.getOffersForId(event)};
-    }
-
-    const destination = this.getDestinationById(event.destination);
-    const offers = this.getOffersForId(event);
-    return {...event, offers, destination};
   }
 }

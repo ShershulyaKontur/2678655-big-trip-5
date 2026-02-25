@@ -28,7 +28,7 @@ export const mockOffers = [
     offers: [
       { id: 10, title: 'Choose meal', price: 189 },
       { id: 11, title: 'Book a taxi at the arrival point', price: 121 },
-      { id: 12, title: 'Upgrade to comfort class', price: 68 }
+      { id: 12, title: 'Upgrade to comfort class', price: 1 }
     ]
   },
   {

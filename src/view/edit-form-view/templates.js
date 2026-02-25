@@ -3,15 +3,15 @@ import { humanizePointDueDate } from '../../utils/formatter.js';
 import { capitalizeFirstLetter } from '../../utils/utils.js';
 import he from 'he';
 
-function createCountryOptionTemplate({name}) {
-  return `<option value="${name}"></option>`;
+function createCountryOptionTemplate(country) {
+  return `<option value="${country}"></option>`;
 }
 
 function createImageTemplate({src, description}){
   return `<img class="event__photo" src=${src} alt="${description}">`;
 }
 
-function createEventTypeItemTemplate(type, index){
+function createEventTypeItemTemplate(type, index) {
   const label = capitalizeFirstLetter(type);
   return `<div class="event__type-item">
             <input id="event-type-${type}-${index + 1}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${type}">
@@ -19,8 +19,9 @@ function createEventTypeItemTemplate(type, index){
           </div>`;
 }
 
-function createOffersItemTemplate({title, price, id}, selectedOffers) {
-  const isChecked = selectedOffers.some((offer) => offer.id === id);
+function createOffersItemTemplate(offer, selectedOffers) {
+  const {title, price, id} = offer;
+  const isChecked = selectedOffers.some((selectedOffer) => selectedOffer === id);
 
   return `<div class="event__offer-selector">
             <input class="event__offer-checkbox visually-hidden"
@@ -39,7 +40,7 @@ function createOffersItemTemplate({title, price, id}, selectedOffers) {
 
 export function createFormEditTemplate(state, destinationsData, offersTypes){
   const { type, offers, allOffersType, basePrice, dateFrom, dateTo } = state;
-  const { name, description, pictures } = state.destination;
+  const { name , description = '', pictures = [] } = state.destinationById || {};
 
   const startDay = humanizePointDueDate(dateFrom, DateFormat.FULL_DATE_FORMAT);
   const endDay = humanizePointDueDate(dateTo, DateFormat.FULL_DATE_FORMAT);
@@ -113,3 +114,4 @@ export function createFormEditTemplate(state, destinationsData, offersTypes){
             </section>
           </form>`;
 }
+

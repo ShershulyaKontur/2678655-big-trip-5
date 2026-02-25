@@ -1,12 +1,12 @@
 import { render, replace, remove } from '../framework/render.js';
 import { SortType } from '../constants/sort-const.js';
 import { SortFns } from '../constants/sort-const.js';
-import { UpdateType, UserAction } from '../constants/const.js';
-import { Filter, FilterType } from '../constants/filter-const.js';
 import SortView from '../view/sort-view/sort-view.js';
 import EventListView from '../view/event-list-view/event-list-view.js';
 import EmptyList from '../view/list-empty-view/list-empty-view.js';
 import EventPresenter from './event-presenter.js';
+import { Filter, FilterType } from '../constants/filter-const.js';
+import { UpdateType, UserAction } from '../constants/const.js';
 import NewEventPresenter from './new-event-presenter.js';
 
 export default class ListPresenter {
@@ -31,11 +31,12 @@ export default class ListPresenter {
 
     this.#eventsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
+
   }
 
   get events() {
     this.#filterType = this.#filterModel.filter;
-    const events = this.#eventsModel.fullEvents;
+    const events = this.#eventsModel.events;
     const filterFunction = Filter[this.#filterType];
 
     return filterFunction(events).sort(SortFns[this.#currentSortType]);
@@ -61,34 +62,6 @@ export default class ListPresenter {
     });
 
     this.#newEventPresenter.init();
-  }
-
-  #render() {
-    if (this.events.length === 0) {
-      this.#renderEmptyList();
-      return;
-    }
-
-    this.#renderSort();
-    this.#renderEventListComponent();
-    this.#renderEvents();
-  }
-
-  #clearList({resetSortType = false} = {}) {
-    this.#clearEvents();
-
-    if (this.#newEventPresenter) {
-      this.#newEventPresenter.destroy();
-      this.#newEventPresenter = null;
-    }
-
-    remove(this.#emptyListComponent);
-    remove(this.#eventListComponent);
-    remove(this.#sortComponent);
-
-    if (resetSortType) {
-      this.#currentSortType = SortType.DAY;
-    }
   }
 
   #renderSort() {
@@ -129,14 +102,37 @@ export default class ListPresenter {
     this.events.forEach((event) => this.#renderEvent(event));
   }
 
-  #clearEvents() {
-    this.#eventPresenters.forEach((presenter) => presenter.destroy());
-    this.#eventPresenters.clear();
-  }
-
   #renderEmptyList() {
     this.#emptyListComponent = new EmptyList({filterType: this.#filterType});
     render(this.#emptyListComponent, this.#container);
+  }
+
+  #render() {
+    if (this.events.length === 0) {
+      this.#renderEmptyList();
+      return;
+    }
+
+    this.#renderSort();
+    this.#renderEventListComponent();
+    this.#renderEvents();
+  }
+
+  #clearList({resetSortType = false} = {}) {
+    this.#clearEvents();
+
+    remove(this.#emptyListComponent);
+    remove(this.#eventListComponent);
+    remove(this.#sortComponent);
+
+    if (resetSortType) {
+      this.#currentSortType = SortType.DAY;
+    }
+  }
+
+  #clearEvents() {
+    this.#eventPresenters.forEach((presenter) => presenter.destroy());
+    this.#eventPresenters.clear();
   }
 
   setSortType(sortType) {

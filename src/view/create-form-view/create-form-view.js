@@ -20,7 +20,10 @@ export default class CreateFormView extends AbstractStatefulView {
     this.#allDestinations = allDestinations;
     this.#allOffers = allOffers;
 
-    this._setState(DEFAULT_CREATE_STATE);
+    this._setState(
+      {...DEFAULT_CREATE_STATE, isDestinationValid: true }
+    );
+
     this._restoreHandlers();
   }
 
@@ -51,6 +54,7 @@ export default class CreateFormView extends AbstractStatefulView {
       checkbox.addEventListener('change', this.#offerChangeHandler);
     });
 
+    this.#updateSaveButtonState();
     this.#setDatepickers();
   }
 
@@ -62,7 +66,7 @@ export default class CreateFormView extends AbstractStatefulView {
       dateFrom: this._state.dateFrom,
       dateTo: this._state.dateTo,
       destination: this._state.destination,
-      offers: this._state.offers,
+      offers: this._state.offers.map((offer) => offer.id),
       isFavorite: false
     };
     this.#handleFormSubmit(newEvent);
@@ -84,26 +88,34 @@ export default class CreateFormView extends AbstractStatefulView {
   };
 
   #destinationChangeHandler = (evt) => {
-    evt.preventDefault();
-    const targetDestination = evt.target.value;
-    const newDestination = this.#allDestinations.find(
-      (item) => item.name.toLowerCase() === targetDestination.toLowerCase()
-    );
+    const inputValue = evt.target.value;
+    const newDestination = this.#allDestinations.find((item) => item.name === inputValue);
 
     if (newDestination) {
       this.updateElement({
-        destination: newDestination
+        destination: newDestination.id,
+        destinationById: newDestination,
+        isDestinationValid: true
       });
+      return;
     }
+
+    this.updateElement({
+      destination: null,
+      destinationById: {
+        name: inputValue,
+        description: '',
+        pictures: []
+      },
+      isDestinationValid: false
+    });
+
   };
 
   #priceChangeHandler = (evt) => {
     const input = evt.target;
     input.value = input.value.replace(/[^\d]/g, '');
-    const newPrice = Number(input.value) || '';
-    this._setState({
-      basePrice: newPrice
-    });
+    this._setState({ basePrice: Number(input.value) });
   };
 
   #offerChangeHandler = (evt) => {
@@ -122,6 +134,13 @@ export default class CreateFormView extends AbstractStatefulView {
       : this._state.offers.filter((offer) => offer.id !== offerId);
 
     this.updateElement({ offers: updatedOffers });
+  };
+
+  #updateSaveButtonState = () => {
+    const saveButton = this.element.querySelector('.event__save-btn');
+    if (saveButton) {
+      saveButton.disabled = !this._state.isDestinationValid;
+    }
   };
 
 

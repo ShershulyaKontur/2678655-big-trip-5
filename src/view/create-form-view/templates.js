@@ -4,8 +4,13 @@ import { humanizePointDueDate } from '../../utils/formatter';
 import he from 'he';
 
 export function createFormCreateTemplate(state, allDestinations, allOffers) {
-  const { type, offers, destination, basePrice, dateFrom, dateTo } = state;
+  const { type, offers, destination, basePrice, dateFrom, dateTo, destinationById = {} } = state;
 
+  const cityData = destination
+    ? allDestinations.find((item) => item.id === destination)
+    : destinationById;
+
+  const { name = '', description = '', pictures = [] } = cityData || {};
   const typeOffers = allOffers.find((item) => item.type === type)?.offers || [];
 
   const startDay = humanizePointDueDate(dateFrom, DateFormat.FULL_DATE_FORMAT);
@@ -49,7 +54,7 @@ export function createFormCreateTemplate(state, allDestinations, allOffers) {
           id="event-destination-1"
           type="text"
           name="event-destination"
-          value="${he.encode(destination.name)}"
+          value="${he.encode(name)}"
           list="destination-list-1">
         <datalist id="destination-list-1">
           ${allDestinations.map((dest) => `<option value="${dest.name}"></option>`).join('')}
@@ -112,19 +117,21 @@ export function createFormCreateTemplate(state, allDestinations, allOffers) {
         </section>
       ` : ''}
 
-      <section class="event__section event__section--destination">
-        <h3 class="event__section-title event__section-title--destination">Destination</h3>
-        <p class="event__destination-description">${destination.description || ''}</p>
-        ${destination.pictures && destination.pictures.length > 0 ? `
-          <div class="event__photos-container">
-            <div class="event__photos-tape">
-              ${destination.pictures.map((picture) => `
-                <img class="event__photo" src="${picture.src}" alt="${picture.description}">
-              `).join('')}
+      ${description ? `
+        <section class="event__section event__section--destination">
+          <h3 class="event__section-title event__section-title--destination">Destination</h3>
+          <p class="event__destination-description">${description}</p>
+          ${pictures.length > 0 ? `
+            <div class="event__photos-container">
+              <div class="event__photos-tape">
+                ${pictures.map((picture) => `
+                  <img class="event__photo" src="${picture.src}" alt="${picture.description}">
+                `).join('')}
+              </div>
             </div>
-          </div>
-        ` : ''}
-      </section>
+          ` : ''}
+        </section>
+      ` : ''}
     </section>
   </form>`;
 }
