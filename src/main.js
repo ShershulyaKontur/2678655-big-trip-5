@@ -38,16 +38,16 @@ const listPresenter = new ListPresenter({
 
 function handleNewEventFormClose(){
   newTaskButtonComponent.element.disabled = false;
-};
+}
 
 function handleNewEventButtonClick(){
   listPresenter.createEvent();
   newTaskButtonComponent.element.disabled = true;
-};
+}
 
 listPresenter.init();
 filtersPresenter.init();
 eventsModel.init()
   .finally(() => {
     render(newTaskButtonComponent, headerContainer);
-  });;
+  });

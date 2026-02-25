@@ -57,7 +57,7 @@ export default class EventsModel extends Observable {
     this._notify(updateType, update);
   }
 
-  updateEvent(updateType, update) {
+  async updateEvent(updateType, update) {
     const updatedEvents = this.events.map((event) =>
       event.id === update.id ? update : event
     );
@@ -66,8 +66,15 @@ export default class EventsModel extends Observable {
       throw new Error('Can\'t update unexisting task');
     }
 
-    this.events = updatedEvents;
-    this._notify(updateType, update);
+    try {
+      const response = await this.#eventsApiService.updateEvent(update);
+      const updatedEvent = this.#adaptToClient(response);
+      this.events = updatedEvents;
+      this._notify(updateType, updatedEvent);
+
+    } catch(err) {
+      throw new Error('Can\'t update task');
+    }
   }
 
   deleteEvent(updateType, update) {
