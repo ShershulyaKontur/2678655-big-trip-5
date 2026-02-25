@@ -1,3 +1,5 @@
+import dayjs from 'dayjs';
+
 export function capitalizeFirstLetter(string) {
   if (!string){
     return string;
@@ -5,8 +7,6 @@ export function capitalizeFirstLetter(string) {
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-export function updateItem(items, update){
-  return items.map((item) => item.id === update.id ? update : item);
+export function isDatesEqual(dateA, dateB){
+  return (dateA === null && dateB === null) || dayjs(dateA).isSame(dateB, 'D');
 }
-
-

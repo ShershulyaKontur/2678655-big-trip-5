@@ -1,41 +1,67 @@
-import { render, replace } from '../framework/render.js';
-import { updateItem } from '../utils/utils.js';
+import { render, replace, remove } from '../framework/render.js';
 import { SortType } from '../constants/sort-const.js';
 import { SortFns } from '../constants/sort-const.js';
 import SortView from '../view/sort-view/sort-view.js';
 import EventListView from '../view/event-list-view/event-list-view.js';
 import EmptyList from '../view/list-empty-view/list-empty-view.js';
 import EventPresenter from './event-presenter.js';
+import { Filter, FilterType } from '../constants/filter-const.js';
+import { UpdateType, UserAction } from '../constants/const.js';
+import NewEventPresenter from './new-event-presenter.js';
 
 export default class ListPresenter {
   #container = null;
+  #eventsModel = null;
+  #filterModel = null;
   #sortComponent = null;
-  #model = null;
-
-  #events = [];
-  #sourcedEvents = [];
+  #emptyListComponent = null;
+  #newEventPresenter = null;
+  #onNewEventDestroy = null;
 
   #eventPresenters = new Map();
   #eventListComponent = new EventListView();
-  #emptyListComponent = new EmptyList();
   #currentSortType = SortType.DAY;
+  #filterType = FilterType.EVERYTHING;
 
-  constructor({ container, model }) {
+  constructor({ container, eventsModel, filterModel, onNewEventDestroy}) {
     this.#container = container;
-    this.#model = model;
+    this.#eventsModel = eventsModel;
+    this.#filterModel = filterModel;
+    this.#onNewEventDestroy = onNewEventDestroy;
+
+    this.#eventsModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
+
   }
 
-  init(events) {
-    this.#events = [...events];
-    this.#sourcedEvents = [...this.#events];
-    this.#events.sort(SortFns[this.#currentSortType]);
+  get events() {
+    this.#filterType = this.#filterModel.filter;
+    const events = this.#eventsModel.events;
+    const filterFunction = Filter[this.#filterType];
+
+    return filterFunction(events).sort(SortFns[this.#currentSortType]);
+  }
+
+  init() {
     this.#render();
   }
 
-  #renderContent() {
-    this.#renderSort();
-    this.#renderEventListComponent();
-    this.#renderEvents();
+  createEvent() {
+    if (!this.#eventListComponent.element) {
+      this.#renderEventListComponent();
+    }
+
+    this.#currentSortType = SortType.DAY;
+    this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+
+    this.#newEventPresenter = new NewEventPresenter({
+      eventListContainer: this.#eventListComponent.element,
+      onDataChange: this.#handleViewAction,
+      onDestroy: this.#onNewEventDestroy,
+      eventsModel: this.#eventsModel
+    });
+
+    this.#newEventPresenter.init();
   }
 
   #renderSort() {
@@ -63,9 +89,9 @@ export default class ListPresenter {
 
   #renderEvent(event) {
     const eventPresenter = new EventPresenter({
-      model: this.#model,
+      eventsModel: this.#eventsModel,
       eventListComponent: this.#eventListComponent.element,
-      onDataChange: this.#handleEventChange,
+      onDataChange: this.#handleViewAction,
       onModeViewChange: this.#handleModeViewChange
     });
     eventPresenter.init(event);
@@ -73,28 +99,40 @@ export default class ListPresenter {
   }
 
   #renderEvents() {
-    this.#events.forEach((event) => this.#renderEvent(event));
+    this.events.forEach((event) => this.#renderEvent(event));
   }
 
   #renderEmptyList() {
+    this.#emptyListComponent = new EmptyList({filterType: this.#filterType});
     render(this.#emptyListComponent, this.#container);
   }
 
   #render() {
-    if (this.#events.length === 0) {
+    if (this.events.length === 0) {
       this.#renderEmptyList();
       return;
     }
-    this.#renderContent();
+
+    this.#renderSort();
+    this.#renderEventListComponent();
+    this.#renderEvents();
   }
 
-  #clearEventList() {
+  #clearList({resetSortType = false} = {}) {
+    this.#clearEvents();
+
+    remove(this.#emptyListComponent);
+    remove(this.#eventListComponent);
+    remove(this.#sortComponent);
+
+    if (resetSortType) {
+      this.#currentSortType = SortType.DAY;
+    }
+  }
+
+  #clearEvents() {
     this.#eventPresenters.forEach((presenter) => presenter.destroy());
     this.#eventPresenters.clear();
-  }
-
-  #sortTasks(sortType) {
-    this.#events = [...this.#sourcedEvents].sort(SortFns[sortType]);
   }
 
   setSortType(sortType) {
@@ -103,9 +141,8 @@ export default class ListPresenter {
     }
 
     this.#currentSortType = sortType;
-    this.#sortTasks(sortType);
     this.#replaceSort();
-    this.#clearEventList();
+    this.#clearEvents();
     this.#renderEvents();
   }
 
@@ -113,12 +150,41 @@ export default class ListPresenter {
     this.setSortType(sortType);
   };
 
-  #handleEventChange = (updateEvent) => {
-    this.#events = updateItem(this.#events, updateEvent);
-    this.#eventPresenters.get(updateEvent.id).init(updateEvent);
+  #handleModeViewChange = () => {
+    if (this.#newEventPresenter) {
+      this.#newEventPresenter.destroy();
+      this.#newEventPresenter = null;
+    }
+    this.#eventPresenters.forEach((presenter) => presenter.resetView());
   };
 
-  #handleModeViewChange = () => {
-    this.#eventPresenters.forEach((presenter) => presenter.resetView());
+  #handleModelEvent = (updateType, data) => {
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this.#eventPresenters.get(data.id).init(data);
+        break;
+      case UpdateType.MINOR:
+        this.#clearList();
+        this.#render();
+        break;
+      case UpdateType.MAJOR:
+        this.#clearList({resetSortType: true});
+        this.#render();
+        break;
+    }
+  };
+
+  #handleViewAction = (actionType, updateType, update) => {
+    switch (actionType) {
+      case UserAction.UPDATE_EVENT:
+        this.#eventsModel.updateEvent(updateType, update);
+        break;
+      case UserAction.ADD_EVENT:
+        this.#eventsModel.addEvent(updateType, update);
+        break;
+      case UserAction.DELETE_EVENT:
+        this.#eventsModel.deleteEvent(updateType, update);
+        break;
+    }
   };
 }

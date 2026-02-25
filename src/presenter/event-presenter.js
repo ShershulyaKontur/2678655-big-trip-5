@@ -1,45 +1,49 @@
 import { render, replace, remove } from '../framework/render.js';
 import EventItemView from '../view/event-item-view/event-item-view.js';
-import EditFormView from '../view/form-view/edit-form-view.js';
-import { ESC_KEY, Mode } from '../constants/const.js';
+import EditFormView from '../view//edit-form-view/edit-form-view.js';
+import { ESC_KEY, Mode, UpdateType, UserAction } from '../constants/const.js';
+import { isDatesEqual } from '../utils/utils.js';
 
 export default class EventPresenter {
   #eventEditForm = null;
   #eventComponent = null;
   #eventListComponent = null;
-
+  #eventsModel = null;
   #handleEventChange = null;
   #handleModeViewChange = null;
 
-  #eventData = null;
-  #model = null;
+  #event = null;
   #modeView = Mode.DEFAULT;
 
-  constructor({ eventListComponent, onDataChange, onModeViewChange, model }) {
+  constructor({ eventListComponent, onDataChange, onModeViewChange, eventsModel }) {
     this.#eventListComponent = eventListComponent;
     this.#handleEventChange = onDataChange;
     this.#handleModeViewChange = onModeViewChange;
-    this.#model = model;
+    this.#eventsModel = eventsModel;
   }
 
-  init(eventData) {
-    this.#eventData = eventData;
+  init(event) {
+    this.#event = event;
 
     const prevEventComponent = this.#eventComponent;
     const prevEventEditForm = this.#eventEditForm;
 
     this.#eventEditForm = new EditFormView({
-      eventData,
-      allDestinations: this.#model.destinations,
-      allOffers: this.#model.offers,
-      offersByType: this.#model.getOfferByType(eventData.type),
-      offersTypes: this.#model.getOffersTypes(),
-      onSubmit: () => this.#handleFormSubmit(),
-      onClose: () => this.#handleFormClose()
+      event,
+      onSubmit: (updatedEvent) => this.#handleFormSubmit(updatedEvent),
+      onClose: () => this.#handleFormClose(),
+      onDelete: () => this.#handleDeleteClick(event),
+      allDestinations: this.#eventsModel.destinations,
+      allOffers: this.#eventsModel.offers,
+      destinationById: this.#eventsModel.getDestinationById(event.destination),
+      offersByType: this.#eventsModel.getOfferByType(event.type),
+      offersTypes: this.#eventsModel.getOffersTypes(),
     });
 
     this.#eventComponent = new EventItemView({
-      eventData,
+      event,
+      destination: this.#eventsModel.getDestinationById(event.destination),
+      offers: this.#eventsModel.getOfferByType(event.type),
       onFavorite: () => this.#handleFavoriteClick(),
       onEdit: () => this.#handleEditClick()
     });
@@ -54,6 +58,7 @@ export default class EventPresenter {
         remove(prevEventComponent);
       }
     };
+
 
     if (prevEventComponent === null || prevEventEditForm === null) {
       render(this.#eventComponent, this.#eventListComponent);
@@ -75,10 +80,54 @@ export default class EventPresenter {
   }
 
   #handleFavoriteClick() {
-    this.#handleEventChange({
-      ...this.#eventData,
-      isFavorite: !this.#eventData.isFavorite
-    });
+    this.#handleEventChange(
+      UserAction.UPDATE_EVENT,
+      UpdateType.PATCH,
+      {...this.#event
+        , isFavorite: !this.#event.isFavorite}
+    );
+  }
+
+  #handleDeleteClick(event) {
+    this.#handleEventChange(
+      UserAction.DELETE_EVENT,
+      UpdateType.MINOR,
+      event
+    );
+  }
+
+
+  #handleFormSubmit(update) {
+    const isMinorUpdate =
+      !isDatesEqual(this.#event.dateFrom, update.dateFrom) ||
+      !isDatesEqual(this.#event.dateTo, update.dateTo) ||
+      this.#event.basePrice !== update.basePrice ||
+      this.#event.destination !== update.destination ||
+      this.#event.type !== update.type;
+
+    this.#handleEventChange(
+      UserAction.UPDATE_EVENT,
+      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+      update
+    );
+    this.#replaceFormToEvent();
+  }
+
+  #escKeyDownHandler = (evt) => {
+    if (evt.key === ESC_KEY) {
+      evt.preventDefault();
+      this.#eventEditForm.reset();
+      this.#replaceFormToEvent();
+    }
+  };
+
+  #handleFormClose() {
+    this.#eventEditForm.reset();
+    this.#replaceFormToEvent();
+  }
+
+  #handleEditClick() {
+    this.#replaceEventToForm();
   }
 
   #replaceEventToForm() {
@@ -94,24 +143,4 @@ export default class EventPresenter {
     this.#modeView = Mode.DEFAULT;
   }
 
-  #escKeyDownHandler = (evt) => {
-    if (evt.key === ESC_KEY) {
-      evt.preventDefault();
-      this.#eventEditForm.reset();
-      this.#replaceFormToEvent();
-    }
-  };
-
-  #handleFormSubmit() {
-    this.#replaceFormToEvent();
-  }
-
-  #handleFormClose() {
-    this.#eventEditForm.reset();
-    this.#replaceFormToEvent();
-  }
-
-  #handleEditClick() {
-    this.#replaceEventToForm();
-  }
 }
