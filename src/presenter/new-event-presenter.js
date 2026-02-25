@@ -26,7 +26,8 @@ export default class NewEventPresenter {
       onSubmit: this.#handleFormSubmit,
       onClose: this.#handleCancelClick,
       allDestinations: this.#eventsModel.destinations,
-      allOffers:this.#eventsModel.offers
+      allOffers: this.#eventsModel.offers,
+      offersTypes: this.#eventsModel.getOffersTypes(),
     });
 
     render(this.#eventCreateView, this.#eventListContainer, RenderPosition.AFTERBEGIN);

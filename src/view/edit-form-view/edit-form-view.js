@@ -85,7 +85,7 @@ export default class EditFormView extends AbstractStatefulView{
   };
 
   #offerChangeHandler = (evt) => {
-    const offerId = parseInt(evt.target.id.replace('event-offer-', ''), 10);
+    const offerId = evt.target.id.replace('event-offer-', '');
     const isChecked = evt.target.checked;
     const typeOffers = this.#allOffers.find((offer) => offer.type === this._state.type)?.offers || [];
     const offerToToggle = typeOffers.find((offer) => offer.id === offerId);

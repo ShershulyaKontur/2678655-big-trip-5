@@ -8,6 +8,7 @@ import EventPresenter from './event-presenter.js';
 import { Filter, FilterType } from '../constants/filter-const.js';
 import { UpdateType, UserAction } from '../constants/const.js';
 import NewEventPresenter from './new-event-presenter.js';
+import LoadingView from '../view/loading-view/loading-view.js';
 
 export default class ListPresenter {
   #container = null;
@@ -20,19 +21,20 @@ export default class ListPresenter {
 
   #eventPresenters = new Map();
   #eventListComponent = new EventListView();
+  #loadingComponent = new LoadingView();
   #currentSortType = SortType.DAY;
   #filterType = FilterType.EVERYTHING;
+  #isLoading = true;
 
   constructor({ container, eventsModel, filterModel, onNewEventDestroy}) {
     this.#container = container;
     this.#eventsModel = eventsModel;
     this.#filterModel = filterModel;
     this.#onNewEventDestroy = onNewEventDestroy;
-
     this.#eventsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
-
   }
+
 
   get events() {
     this.#filterType = this.#filterModel.filter;
@@ -58,7 +60,7 @@ export default class ListPresenter {
       eventListContainer: this.#eventListComponent.element,
       onDataChange: this.#handleViewAction,
       onDestroy: this.#onNewEventDestroy,
-      eventsModel: this.#eventsModel
+      eventsModel: this.#eventsModel,
     });
 
     this.#newEventPresenter.init();
@@ -105,9 +107,19 @@ export default class ListPresenter {
   #renderEmptyList() {
     this.#emptyListComponent = new EmptyList({filterType: this.#filterType});
     render(this.#emptyListComponent, this.#container);
+    remove(this.#loadingComponent);
+  }
+
+  #renderLoading() {
+    render(this.#loadingComponent, this.#container);
   }
 
   #render() {
+    if (this.#isLoading) {
+      this.#renderLoading();
+      return;
+    }
+
     if (this.events.length === 0) {
       this.#renderEmptyList();
       return;
@@ -171,6 +183,11 @@ export default class ListPresenter {
         this.#clearList({resetSortType: true});
         this.#render();
         break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        remove(this.#loadingComponent);
+        this.#render();
+        break;
     }
   };
 
@@ -185,6 +202,7 @@ export default class ListPresenter {
       case UserAction.DELETE_EVENT:
         this.#eventsModel.deleteEvent(updateType, update);
         break;
+
     }
   };
 }

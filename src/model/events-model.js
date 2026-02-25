@@ -1,16 +1,37 @@
-import { getDestinations, getOffers, getEvents } from '../mock/mock-utils.js';
 import Observable from '../framework/observable.js';
+import { UpdateType } from '../constants/const.js';
 
 export default class EventsModel extends Observable {
-  #events = null;
+  #events = [];
   #offers = null;
   #destinations = null;
+  #eventsApiService = null;
 
-  constructor() {
+
+  constructor({eventsApiService}) {
     super();
-    this.#events = getEvents();
-    this.#offers = getOffers();
-    this.#destinations = getDestinations();
+    this.#eventsApiService = eventsApiService;
+  }
+
+  async init(){
+    try{
+      const [events, destinations, offers] = await Promise.all([
+        this.#eventsApiService.events,
+        this.#eventsApiService.destinations,
+        this.#eventsApiService.offers
+      ]);
+
+      this.events = events.map(this.#adaptToClient);
+      this.#destinations = destinations;
+      this.#offers = offers;
+
+    }catch(err){
+      this.#events = [];
+      this.#offers = [];
+      this.#destinations = null;
+    }
+
+    this._notify(UpdateType.INIT);
   }
 
   get events() {
@@ -30,12 +51,13 @@ export default class EventsModel extends Observable {
     return this.#destinations;
   }
 
+
   addEvent(updateType, update) {
     this.events = [update, ...this.events];
     this._notify(updateType, update);
   }
 
-  updateEvent(updateType, update) {
+  async updateEvent(updateType, update) {
     const updatedEvents = this.events.map((event) =>
       event.id === update.id ? update : event
     );
@@ -44,8 +66,15 @@ export default class EventsModel extends Observable {
       throw new Error('Can\'t update unexisting task');
     }
 
-    this.events = updatedEvents;
-    this._notify(updateType, update);
+    try {
+      const response = await this.#eventsApiService.updateEvent(update);
+      const updatedEvent = this.#adaptToClient(response);
+      this.events = updatedEvents;
+      this._notify(updateType, updatedEvent);
+
+    } catch(err) {
+      throw new Error('Can\'t update task');
+    }
   }
 
   deleteEvent(updateType, update) {
@@ -75,5 +104,21 @@ export default class EventsModel extends Observable {
 
   getOffersTypes(){
     return this.offers?.map((offer) => offer.type) ?? [];
+  }
+
+  #adaptToClient(event) {
+    const adaptedTask = {...event,
+      basePrice: event['base_price'],
+      isFavorite: event['is_favorite'],
+      dateTo: event['date_to'],
+      dateFrom: event['date_from'],
+    };
+
+    delete adaptedTask['base_price'];
+    delete adaptedTask['is_favorite'];
+    delete adaptedTask['date_to'];
+    delete adaptedTask['date_from'];
+
+    return adaptedTask;
   }
 }
