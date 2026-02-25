@@ -5,12 +5,20 @@ export default class EventsModel extends Observable {
   #events = null;
   #offers = null;
   #destinations = null;
+  #eventsApiService = null;
 
-  constructor() {
+
+  constructor({eventsApiService}) {
     super();
     this.#events = getEvents();
     this.#offers = getOffers();
     this.#destinations = getDestinations();
+    this.#eventsApiService = eventsApiService;
+
+    this.#eventsApiService.events.then((events) => {
+      console.log(events)
+      console.log(events.map(this.#adaptToClient));
+    })
   }
 
   get events() {
@@ -75,5 +83,21 @@ export default class EventsModel extends Observable {
 
   getOffersTypes(){
     return this.offers?.map((offer) => offer.type) ?? [];
+  }
+
+  #adaptToClient(event) {
+    const adaptedTask = {...event,
+      basePrice: event['base_price'],
+      isFavorite: event['is_favorite'],
+      dateTo: event['date_to'],
+      dateFrom: event['date_from'],
+    };
+
+    delete adaptedTask['base_price'];
+    delete adaptedTask['is_favorite'];
+    delete adaptedTask['date_to'];
+    delete adaptedTask['date_from'];
+
+    return adaptedTask;
   }
 }
