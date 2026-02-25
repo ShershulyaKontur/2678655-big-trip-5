@@ -11,6 +11,11 @@ export const UpdateType = {
   MAJOR: 'MAJOR',
 };
 
+export const Method = {
+  GET: 'GET',
+  PUT: 'PUT',
+};
+
 export const UserAction = {
   UPDATE_EVENT: 'UPDATE_EVENT',
   ADD_EVENT: 'ADD_EVENT',
