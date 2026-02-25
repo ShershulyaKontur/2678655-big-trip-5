@@ -1,8 +1,8 @@
-import { getDestinations, getOffers, getEvents } from '../mock/mock-utils.js';
 import Observable from '../framework/observable.js';
+import { UpdateType } from '../constants/const.js';
 
 export default class EventsModel extends Observable {
-  #events = null;
+  #events = [];
   #offers = null;
   #destinations = null;
   #eventsApiService = null;
@@ -10,15 +10,28 @@ export default class EventsModel extends Observable {
 
   constructor({eventsApiService}) {
     super();
-    this.#events = getEvents();
-    this.#offers = getOffers();
-    this.#destinations = getDestinations();
     this.#eventsApiService = eventsApiService;
+  }
 
-    this.#eventsApiService.events.then((events) => {
-      console.log(events)
-      console.log(events.map(this.#adaptToClient));
-    })
+  async init(){
+    try{
+      const [events, destinations, offers] = await Promise.all([
+        this.#eventsApiService.events,
+        this.#eventsApiService.destinations,
+        this.#eventsApiService.offers
+      ]);
+
+      this.events = events.map(this.#adaptToClient);
+      this.#destinations = destinations;
+      this.#offers = offers;
+
+    }catch(err){
+      this.#events = [];
+      this.#offers = [];
+      this.#destinations = null;
+    }
+
+    this._notify(UpdateType.INIT);
   }
 
   get events() {
@@ -37,6 +50,7 @@ export default class EventsModel extends Observable {
   get destinations() {
     return this.#destinations;
   }
+
 
   addEvent(updateType, update) {
     this.events = [update, ...this.events];
