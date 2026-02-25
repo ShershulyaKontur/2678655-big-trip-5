@@ -60,7 +60,7 @@ export default class ListPresenter {
       eventListContainer: this.#eventListComponent.element,
       onDataChange: this.#handleViewAction,
       onDestroy: this.#onNewEventDestroy,
-      eventsModel: this.#eventsModel
+      eventsModel: this.#eventsModel,
     });
 
     this.#newEventPresenter.init();

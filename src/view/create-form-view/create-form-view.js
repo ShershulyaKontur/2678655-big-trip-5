@@ -11,14 +11,16 @@ export default class CreateFormView extends AbstractStatefulView {
   #datepickerFrom = null;
   #datepickerTo = null;
   #allDestinations = null;
+  #offersTypes = null;
   #allOffers = [];
 
-  constructor({ onSubmit, onClose, allDestinations, allOffers }) {
+  constructor({ onSubmit, onClose, allDestinations, allOffers, offersTypes }) {
     super();
     this.#handleFormSubmit = onSubmit;
     this.#closeHandler = onClose;
     this.#allDestinations = allDestinations;
     this.#allOffers = allOffers;
+    this.#offersTypes = offersTypes;
 
     this._setState(
       {...DEFAULT_CREATE_STATE, isDestinationValid: true }
@@ -28,7 +30,7 @@ export default class CreateFormView extends AbstractStatefulView {
   }
 
   get template() {
-    return createFormCreateTemplate(this._state, this.#allDestinations, this.#allOffers);
+    return createFormCreateTemplate(this._state, this.#allDestinations, this.#allOffers, this.#offersTypes);
   }
 
   reset() {

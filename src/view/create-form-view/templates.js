@@ -1,15 +1,13 @@
 import { DateFormat } from '../../constants/const';
-import { EVENT_TYPE } from '../../constants/mock-const';
 import { humanizePointDueDate } from '../../utils/formatter';
 import he from 'he';
 
-export function createFormCreateTemplate(state, allDestinations, allOffers) {
+export function createFormCreateTemplate(state, allDestinations, allOffers, offersTypes) {
   const { type, offers, destination, basePrice, dateFrom, dateTo, destinationById = {} } = state;
 
   const cityData = destination
     ? allDestinations.find((item) => item.id === destination)
     : destinationById;
-
   const { name = '', description = '', pictures = [] } = cityData || {};
   const typeOffers = allOffers.find((item) => item.type === type)?.offers || [];
 
@@ -28,7 +26,7 @@ export function createFormCreateTemplate(state, allDestinations, allOffers) {
         <div class="event__type-list">
           <fieldset class="event__type-group">
             <legend class="visually-hidden">Event type</legend>
-            ${EVENT_TYPE.map((typeOption) => `
+            ${offersTypes.map((typeOption) => `
             <div class="event__type-item">
               <input id="event-type-${typeOption}-1"
                 class="event__type-input visually-hidden"
