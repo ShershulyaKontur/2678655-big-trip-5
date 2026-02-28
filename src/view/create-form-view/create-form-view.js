@@ -1,8 +1,8 @@
 import { createFormCreateTemplate } from './templates.js';
+import { DateFormat, DEFAULT_CREATE_STATE } from '../../constants/const.js';
 import AbstractStatefulView from '../../framework/view/abstract-stateful-view.js';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
-import { DateFormat, DEFAULT_CREATE_STATE } from '../../constants/const.js';
 import dayjs from 'dayjs';
 
 export default class CreateFormView extends AbstractStatefulView {
@@ -77,7 +77,7 @@ export default class CreateFormView extends AbstractStatefulView {
     this.#updateSaveButton();
   }
 
-  #updateSaveButton  = () => {
+  #updateSaveButton = () => {
     const saveButton = this.element?.querySelector('.event__save-btn');
 
     if (saveButton) {
@@ -165,7 +165,7 @@ export default class CreateFormView extends AbstractStatefulView {
   };
 
   #dateFromChangeHandler = ([userDate]) => {
-    this._setState( {dateFrom: userDate} );
+    this._setState({ dateFrom: userDate });
     this.#updateSaveButton();
 
     if (this.#datepickerTo) {
@@ -174,7 +174,7 @@ export default class CreateFormView extends AbstractStatefulView {
   };
 
   #dateToChangeHandler = ([userDate]) => {
-    this._setState( {dateTo: userDate} );
+    this._setState({ dateTo: userDate });
     this.#updateSaveButton();
 
     if (this.#datepickerFrom) {

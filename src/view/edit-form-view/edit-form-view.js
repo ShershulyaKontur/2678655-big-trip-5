@@ -1,9 +1,9 @@
 import { createFormEditTemplate } from './templates.js';
+import { DateFormat } from '../../constants/const.js';
 import AbstractStatefulView from '../../framework/view/abstract-stateful-view.js';
 import dayjs from 'dayjs';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
-import { DateFormat } from '../../constants/const.js';
 
 export default class EditFormView extends AbstractStatefulView{
   #handleFormSubmit = null;

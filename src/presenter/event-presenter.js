@@ -1,8 +1,8 @@
 import { render, replace, remove } from '../framework/render.js';
-import EventItemView from '../view/event-item-view/event-item-view.js';
-import EditFormView from '../view//edit-form-view/edit-form-view.js';
 import { ESC_KEY, Mode, UpdateType, UserAction } from '../constants/const.js';
 import { isDatesEqual } from '../utils/utils.js';
+import EventItemView from '../view/event-item-view/event-item-view.js';
+import EditFormView from '../view//edit-form-view/edit-form-view.js';
 
 export default class EventPresenter {
   #eventEditForm = null;
@@ -84,7 +84,7 @@ export default class EventPresenter {
       this.#eventEditForm.updateElement({
         isDisable: true,
         isSaving: true
-      })
+      });
     }
   }
 
@@ -93,7 +93,7 @@ export default class EventPresenter {
       this.#eventEditForm.updateElement({
         isDisable: true,
         isDeleting: true
-      })
+      });
     }
   }
 

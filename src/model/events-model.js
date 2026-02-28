@@ -1,5 +1,5 @@
-import Observable from '../framework/observable.js';
 import { UpdateType } from '../constants/const.js';
+import Observable from '../framework/observable.js';
 
 export default class EventsModel extends Observable {
   #events = [];

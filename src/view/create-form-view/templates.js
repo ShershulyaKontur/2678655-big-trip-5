@@ -139,12 +139,9 @@ export function createFormCreateTemplate(state, allDestinations, allOffers, offe
         <section class="event__section event__section--offers">
           <h3 class="event__section-title event__section-title--offers">Offers</h3>
           <div class="event__available-offers">
-            ${typeOffers.map((offerItem) =>
-              createOffersItemTemplate(offerItem, offers, isDisable)
-            ).join('')}
+          ${typeOffers.map((offerItem) => createOffersItemTemplate(offerItem, offers, isDisable)).join('')}
           </div>
-        </section>
-      ` : ''}
+        </section>` : ''}
 
       ${description ? `
         <section class="event__section event__section--destination">
