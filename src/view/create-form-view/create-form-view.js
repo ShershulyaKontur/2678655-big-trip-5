@@ -38,7 +38,7 @@ export default class CreateFormView extends AbstractStatefulView {
 
   get _isFormValid() {
     const isDestinationSelected = this._state.destination && this._state.destination !== '';
-    const isDatesValid = this._state.dateFrom && this._state.dateTo;
+    const isDatesValid = this._state.dateFrom && this._state.dateTo && this._state.dateFrom < this._state.dateTo;
     const isPriceValid = this._state.basePrice > 0;
 
     return isDestinationSelected && isDatesValid && isPriceValid;
@@ -109,7 +109,7 @@ export default class CreateFormView extends AbstractStatefulView {
     evt.preventDefault();
     const newType = evt.target.value;
 
-    this._setState({ type: newType, offers: [] });
+    this.updateElement({ type: newType, offers: [] });
     this.#updateSaveButton();
   };
 
@@ -118,7 +118,7 @@ export default class CreateFormView extends AbstractStatefulView {
     const newDestination = this.#allDestinations.find((item) => item.name === inputValue);
 
     if (newDestination) {
-      this._setState({
+      this.updateElement({
         destination: newDestination.id,
         destinationById: newDestination,
       });
@@ -126,7 +126,7 @@ export default class CreateFormView extends AbstractStatefulView {
       return;
     }
 
-    this._setState({
+    this.updateElement({
       destination: '',
       destinationById: {
         name: inputValue,

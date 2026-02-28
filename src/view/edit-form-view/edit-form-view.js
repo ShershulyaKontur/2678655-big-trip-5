@@ -39,7 +39,7 @@ export default class EditFormView extends AbstractStatefulView{
 
   get _isFormValid() {
     const isDestinationSelected = this._state.destination && this._state.destination !== '';
-    const isDatesValid = this._state.dateFrom && this._state.dateTo;
+    const isDatesValid = this._state.dateFrom && this._state.dateTo && this._state.dateFrom < this._state.dateTo;
     const isPriceValid = this._state.basePrice > 0;
 
     return isDestinationSelected && isDatesValid && isPriceValid;
@@ -47,7 +47,6 @@ export default class EditFormView extends AbstractStatefulView{
 
   reset() {
     this.updateElement(this.#originalState);
-    console.log('state', this._state)
     this.#updateSaveButton();
   }
 
@@ -110,7 +109,7 @@ export default class EditFormView extends AbstractStatefulView{
       ? [...this._state.offers, offerId]
       : this._state.offers.filter((id) => id !== offerId);
 
-    this._setState({ offers: updatedOffers });
+    this.updateElement({ offers: updatedOffers });
     this.#updateSaveButton();
   };
 
@@ -119,7 +118,7 @@ export default class EditFormView extends AbstractStatefulView{
     const targetType = evt.target.value;
     const typeOffers = this.#allOffers.find((item) => item.type === targetType);
 
-    this._setState({
+    this.updateElement({
       type: targetType,
       allOffersType: typeOffers?.offers || [],
       offers: []
@@ -132,7 +131,7 @@ export default class EditFormView extends AbstractStatefulView{
     const newDestination = this.#allDestinations.find((item) => item.name === inputValue);
 
     if (newDestination) {
-      this._setState({
+      this.updateElement({
         destination: newDestination.id,
         destinationById: newDestination,
       });
@@ -159,7 +158,7 @@ export default class EditFormView extends AbstractStatefulView{
   };
 
   #dateFromChangeHandler = ([userDate]) => {
-    this._setState({
+    this.updateElement({
       dateFrom: userDate,
     });
     this.#updateSaveButton();
@@ -170,7 +169,7 @@ export default class EditFormView extends AbstractStatefulView{
   };
 
   #dateToChangeHandler = ([userDate]) => {
-    this._setState({
+    this.updateElement({
       dateTo: userDate,
     });
     this.#updateSaveButton();

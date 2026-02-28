@@ -17,7 +17,6 @@ export default class NewEventPresenter {
   }
 
   init() {
-    console.log(this.#eventListContainer)
     this.#eventCreateView = new CreateFormView({
       onSubmit: this.#handleFormSubmit,
       onClose: this.#handleCancelClick,
@@ -25,10 +24,6 @@ export default class NewEventPresenter {
       allOffers: this.#eventsModel.offers,
       offersTypes: this.#eventsModel.getOffersTypes(),
     });
-
-    console.log("INIT")
-    console.log(this.#eventCreateView)
-    console.log(this.#eventListContainer)
 
     render(this.#eventCreateView, this.#eventListContainer, RenderPosition.AFTERBEGIN);
     document.addEventListener('keydown', this.#escKeyDownHandler);
@@ -58,8 +53,6 @@ export default class NewEventPresenter {
   }
 
   setAborting() {
-    console.log('setAborting called', this.#eventCreateView);
-    console.log('shake method exists:', typeof this.#eventCreateView.shake === 'function');
     const resetFormState = () => {
       this.#eventCreateView.updateElement({
         isDisable: false,
@@ -67,12 +60,7 @@ export default class NewEventPresenter {
         isDeleting: false
       });
     };
-    try {
-      this.#eventCreateView.shake(resetFormState);
-      console.log('shake method called successfully');
-    } catch (error) {
-      console.error('Error calling shake:', error);
-    }
+    this.#eventCreateView.shake(resetFormState);
   }
 
   #handleCancelClick = () => {
@@ -80,16 +68,11 @@ export default class NewEventPresenter {
   };
 
   #handleFormSubmit = async (event) => {
-    try {
-      await this.#handleDataChange(
-        UserAction.ADD_EVENT,
-        UpdateType.MINOR,
-        event
-      );
-      this.destroy();
-    } catch (error) {
-      throw error;
-    }
+    await this.#handleDataChange(
+      UserAction.ADD_EVENT,
+      UpdateType.MINOR,
+      event
+    );
   };
 
   #escKeyDownHandler = (evt) => {

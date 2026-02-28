@@ -116,49 +116,32 @@ export default class EventPresenter {
   }
 
   #handleFavoriteClick = async () => {
-    try {
-      await this.#handleEventChange(
-        UserAction.UPDATE_EVENT,
-        UpdateType.PATCH,
-        {...this.#event, isFavorite: !this.#event.isFavorite}
-      );
-    } catch (error) {
-      throw error;
-    }
+    await this.#handleEventChange(
+      UserAction.UPDATE_EVENT,
+      UpdateType.PATCH,
+      {...this.#event, isFavorite: !this.#event.isFavorite}
+    );
   };
 
   #handleDeleteClick = async (event) => {
-    try {
-      await this.#handleEventChange(
-        UserAction.DELETE_EVENT,
-        UpdateType.MINOR,
-        event
-      );
-    } catch (error) {
-      throw error;
-    }
+    await this.#handleEventChange(
+      UserAction.DELETE_EVENT,
+      UpdateType.MINOR,
+      event
+    );
   };
 
   #handleFormSubmit = async (event) => {
     const isMinorUpdate =
       !isDatesEqual(this.#event.dateFrom, event.dateFrom) ||
       !isDatesEqual(this.#event.dateTo, event.dateTo) ||
-      this.#event.basePrice !== event.basePrice ||
-      this.#event.destination !== event.destination
-    console.log(isMinorUpdate)
+      this.#event.basePrice !== event.basePrice;
 
-    try {
-      await this.#handleEventChange(
-        UserAction.UPDATE_EVENT,
-        isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
-        event
-      );
-      if(!isMinorUpdate){
-        this.#replaceFormToEvent();
-      }
-    } catch (error) {
-      throw error;
-    }
+    await this.#handleEventChange(
+      UserAction.UPDATE_EVENT,
+      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+      event
+    );
   };
 
   #escKeyDownHandler = (evt) => {
@@ -186,8 +169,6 @@ export default class EventPresenter {
   }
 
   #replaceFormToEvent() {
-    console.log(this.#eventComponent)
-    console.log(this.#eventEditForm)
     replace(this.#eventComponent, this.#eventEditForm);
     document.removeEventListener('keydown', this.#escKeyDownHandler);
     this.#modeView = Mode.DEFAULT;
