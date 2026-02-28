@@ -1,8 +1,8 @@
 import { render, replace, remove } from '../framework/render.js';
-import EventItemView from '../view/event-item-view/event-item-view.js';
-import EditFormView from '../view//edit-form-view/edit-form-view.js';
 import { ESC_KEY, Mode, UpdateType, UserAction } from '../constants/const.js';
 import { isDatesEqual } from '../utils/utils.js';
+import EventItemView from '../view/event-item-view/event-item-view.js';
+import EditFormView from '../view//edit-form-view/edit-form-view.js';
 
 export default class EventPresenter {
   #eventEditForm = null;
@@ -79,39 +79,70 @@ export default class EventPresenter {
     }
   }
 
-  #handleFavoriteClick() {
-    this.#handleEventChange(
-      UserAction.UPDATE_EVENT,
-      UpdateType.PATCH,
-      {...this.#event
-        , isFavorite: !this.#event.isFavorite}
-    );
+  setSaving(){
+    if (this.#modeView === Mode.EDITING){
+      this.#eventEditForm.updateElement({
+        isDisable: true,
+        isSaving: true
+      });
+    }
   }
 
-  #handleDeleteClick(event) {
-    this.#handleEventChange(
+  setDeleting(){
+    if (this.#modeView === Mode.EDITING){
+      this.#eventEditForm.updateElement({
+        isDisable: true,
+        isDeleting: true
+      });
+    }
+  }
+
+  setAborting(){
+    if (this.#modeView === Mode.DEFAULT){
+
+      this.#eventComponent.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#eventEditForm.updateElement({
+        isDisable: false,
+        isDeleting: false,
+        isSaving: false
+      });
+    };
+
+    this.#eventEditForm.shake(resetFormState);
+  }
+
+  #handleFavoriteClick = async () => {
+    await this.#handleEventChange(
+      UserAction.UPDATE_EVENT,
+      UpdateType.PATCH,
+      {...this.#event, isFavorite: !this.#event.isFavorite}
+    );
+  };
+
+  #handleDeleteClick = async (event) => {
+    await this.#handleEventChange(
       UserAction.DELETE_EVENT,
       UpdateType.MINOR,
       event
     );
-  }
+  };
 
-
-  #handleFormSubmit(update) {
+  #handleFormSubmit = async (event) => {
     const isMinorUpdate =
-      !isDatesEqual(this.#event.dateFrom, update.dateFrom) ||
-      !isDatesEqual(this.#event.dateTo, update.dateTo) ||
-      this.#event.basePrice !== update.basePrice ||
-      this.#event.destination !== update.destination ||
-      this.#event.type !== update.type;
+      !isDatesEqual(this.#event.dateFrom, event.dateFrom) ||
+      !isDatesEqual(this.#event.dateTo, event.dateTo) ||
+      this.#event.basePrice !== event.basePrice;
 
-    this.#handleEventChange(
+    await this.#handleEventChange(
       UserAction.UPDATE_EVENT,
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
-      update
+      event
     );
-    this.#replaceFormToEvent();
-  }
+  };
 
   #escKeyDownHandler = (evt) => {
     if (evt.key === ESC_KEY) {
@@ -142,5 +173,4 @@ export default class EventPresenter {
     document.removeEventListener('keydown', this.#escKeyDownHandler);
     this.#modeView = Mode.DEFAULT;
   }
-
 }

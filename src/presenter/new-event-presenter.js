@@ -1,6 +1,5 @@
 import { ESC_KEY, UpdateType, UserAction } from '../constants/const.js';
 import { remove, render, RenderPosition } from '../framework/render.js';
-import { nanoid } from 'nanoid';
 import CreateFormView from '../view/create-form-view/create-form-view.js';
 
 export default class NewEventPresenter {
@@ -18,10 +17,6 @@ export default class NewEventPresenter {
   }
 
   init() {
-    if (this.#eventCreateView !== null) {
-      return;
-    }
-
     this.#eventCreateView = new CreateFormView({
       onSubmit: this.#handleFormSubmit,
       onClose: this.#handleCancelClick,
@@ -47,17 +42,37 @@ export default class NewEventPresenter {
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   }
 
+  setSaving() {
+    if (this.#eventCreateView) {
+      this.#eventCreateView.updateElement({
+        isDisable: true,
+        isSaving: true,
+        isDeleting: true
+      });
+    }
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this.#eventCreateView.updateElement({
+        isDisable: false,
+        isSaving: false,
+        isDeleting: false
+      });
+    };
+    this.#eventCreateView.shake(resetFormState);
+  }
+
   #handleCancelClick = () => {
     this.destroy();
   };
 
-  #handleFormSubmit = (event) => {
-    this.#handleDataChange(
+  #handleFormSubmit = async (event) => {
+    await this.#handleDataChange(
       UserAction.ADD_EVENT,
       UpdateType.MINOR,
-      {id: nanoid(), ...event},
+      event
     );
-    this.destroy();
   };
 
   #escKeyDownHandler = (evt) => {

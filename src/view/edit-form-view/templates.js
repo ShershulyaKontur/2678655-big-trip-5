@@ -19,7 +19,7 @@ function createEventTypeItemTemplate(type, index) {
           </div>`;
 }
 
-function createOffersItemTemplate(offer, selectedOffers) {
+function createOffersItemTemplate(offer, selectedOffers, isDisabled) {
   const {title, price, id} = offer;
   const isChecked = selectedOffers.some((selectedOffer) => selectedOffer === id);
 
@@ -28,7 +28,9 @@ function createOffersItemTemplate(offer, selectedOffers) {
               id="event-offer-${id}"
               type="checkbox"
               name="event-offer-${id}"
+              value="${id}"
               ${isChecked ? 'checked' : ''}
+              ${isDisabled ? 'disabled' : ''}
             >
             <label class="event__offer-label" for="event-offer-${id}">
               <span class="event__offer-title">${title}</span>
@@ -39,13 +41,27 @@ function createOffersItemTemplate(offer, selectedOffers) {
 }
 
 export function createFormEditTemplate(state, destinationsData, offersTypes){
-  const { type, offers, allOffersType, basePrice, dateFrom, dateTo } = state;
+  const {
+    type,
+    offers,
+    allOffersType,
+    basePrice,
+    dateFrom,
+    dateTo,
+    isDisable,
+    isSaving,
+    isDeleting
+  } = state;
   const { name , description = '', pictures = [] } = state.destinationById || {};
 
   const startDay = humanizePointDueDate(dateFrom, DateFormat.FULL_DATE_FORMAT);
   const endDay = humanizePointDueDate(dateTo, DateFormat.FULL_DATE_FORMAT);
 
-  return `<form class="event event--edit" action="#" method="post">
+  const resetButtonText = isDeleting ? 'Deleting...' : 'Delete';
+  const saveButtonText = isSaving ? 'Saving...' : 'Save';
+  const isResetButtonDisabled = isDisable || isDeleting;
+
+  return `<form class="event event--edit" action="#" method="post" >
             <header class="event__header">
               <div class="event__type-wrapper">
                 <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -66,7 +82,14 @@ export function createFormEditTemplate(state, destinationsData, offersTypes){
                 <label class="event__label  event__type-output" for="event-destination-1">
                   ${type}
                 </label>
-                <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(name)}" list="destination-list-1">
+                <input class="event__input  event__input--destination"
+                  id="event-destination-1"
+                  type="text"
+                  name="event-destination"
+                  value="${he.encode(name)}"
+                  list="destination-list-1"
+                  ${isDisable ? 'disabled' : ''}
+                >
                 <datalist id="destination-list-1">
                   ${destinationsData.map((destination) => createCountryOptionTemplate(destination)).join('')}
                 </datalist>
@@ -74,10 +97,22 @@ export function createFormEditTemplate(state, destinationsData, offersTypes){
 
               <div class="event__field-group  event__field-group--time">
                 <label class="visually-hidden" for="event-start-time-1">From</label>
-                <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${startDay}">
+                <input class="event__input  event__input--time"
+                  id="event-start-time-1"
+                  type="text"
+                  name="event-start-time"
+                  value="${startDay}"
+                  ${isDisable ? 'disabled' : ''}
+                >
                 &mdash;
                 <label class="visually-hidden" for="event-end-time-1">To</label>
-                <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${endDay}">
+                <input class="event__input  event__input--time"
+                  id="event-end-time-1"
+                  type="text"
+                  name="event-end-time"
+                  value="${endDay}"
+                  ${isDisable ? 'disabled' : ''}
+                >
               </div>
 
               <div class="event__field-group  event__field-group--price">
@@ -85,20 +120,37 @@ export function createFormEditTemplate(state, destinationsData, offersTypes){
                   <span class="visually-hidden">Price</span>
                   &euro;
                 </label>
-                <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value=${basePrice}>
+                <input class="event__input  event__input--price"
+                  id="event-price-1"
+                  type="text"
+                  name="event-price"
+                  value="${basePrice}"
+                  ${isDisable ? 'disabled' : ''}
+                >
               </div>
 
-              <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-              <button class="event__reset-btn" type="reset">Delete</button>
-              <button class="event__rollup-btn" type="button">
+              <button class="event__save-btn  btn  btn--blue"
+                type="submit">
+                ${saveButtonText}
+              </button>
+
+              <button class="event__reset-btn"
+                type="reset"
+                ${isResetButtonDisabled ? 'disabled' : ''}
+              >
+                ${resetButtonText}
+              </button>
+
+              <button class="event__rollup-btn" type="button" ${isDisable ? 'disabled' : ''}>
                 <span class="visually-hidden">Open event</span>
               </button>
             </header>
+
             <section class="event__details">
               <section class="event__section  event__section--offers">
                 <h3 class="event__section-title  event__section-title--offers">Offers</h3>
                 <div class="event__available-offers">
-                  ${allOffersType.map((offer) => createOffersItemTemplate(offer, offers)).join('')}
+                  ${allOffersType.map((offer) => createOffersItemTemplate(offer, offers, isDisable)).join('')}
                 </div>
               </section>
 
@@ -110,8 +162,7 @@ export function createFormEditTemplate(state, destinationsData, offersTypes){
                     ${pictures.map((picture) => createImageTemplate(picture)).join('')}
                   </div>
                 </div>
-                </section>
+              </section>
             </section>
           </form>`;
 }
-

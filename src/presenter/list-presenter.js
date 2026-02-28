@@ -1,14 +1,16 @@
 import { render, replace, remove } from '../framework/render.js';
 import { SortType } from '../constants/sort-const.js';
 import { SortFns } from '../constants/sort-const.js';
-import SortView from '../view/sort-view/sort-view.js';
-import EventListView from '../view/event-list-view/event-list-view.js';
-import EmptyList from '../view/list-empty-view/list-empty-view.js';
-import EventPresenter from './event-presenter.js';
 import { Filter, FilterType } from '../constants/filter-const.js';
-import { UpdateType, UserAction } from '../constants/const.js';
+import { TimeLimit, UpdateType, UserAction } from '../constants/const.js';
 import NewEventPresenter from './new-event-presenter.js';
 import LoadingView from '../view/loading-view/loading-view.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
+import SortView from '../view/sort-view/sort-view.js';
+import EventListView from '../view/event-list-view/event-list-view.js';
+import LoadingErrorView from '../view/failed-load-data-view.js/failed-load-data-view.js';
+import EmptyList from '../view/list-empty-view/list-empty-view.js';
+import EventPresenter from './event-presenter.js';
 
 export default class ListPresenter {
   #container = null;
@@ -16,6 +18,7 @@ export default class ListPresenter {
   #filterModel = null;
   #sortComponent = null;
   #emptyListComponent = null;
+  #loadingErrorComponent = null;
   #newEventPresenter = null;
   #onNewEventDestroy = null;
 
@@ -25,6 +28,11 @@ export default class ListPresenter {
   #currentSortType = SortType.DAY;
   #filterType = FilterType.EVERYTHING;
   #isLoading = true;
+  #isLoadingError = false;
+  #uiBlocker = new UiBlocker({
+    lowerLimit: TimeLimit.LOWER_LIMIT,
+    upperLimit: TimeLimit.UPPER_LIMIT,
+  });
 
   constructor({ container, eventsModel, filterModel, onNewEventDestroy}) {
     this.#container = container;
@@ -34,7 +42,6 @@ export default class ListPresenter {
     this.#eventsModel.addObserver(this.#handleModelEvent);
     this.#filterModel.addObserver(this.#handleModelEvent);
   }
-
 
   get events() {
     this.#filterType = this.#filterModel.filter;
@@ -49,6 +56,10 @@ export default class ListPresenter {
   }
 
   createEvent() {
+    if (this.#isLoadingError) {
+      return;
+    }
+
     if (!this.#eventListComponent.element) {
       this.#renderEventListComponent();
     }
@@ -105,8 +116,9 @@ export default class ListPresenter {
   }
 
   #renderEmptyList() {
+    this.#renderEventListComponent();
     this.#emptyListComponent = new EmptyList({filterType: this.#filterType});
-    render(this.#emptyListComponent, this.#container);
+    render(this.#emptyListComponent, this.#eventListComponent.element);
     remove(this.#loadingComponent);
   }
 
@@ -114,9 +126,20 @@ export default class ListPresenter {
     render(this.#loadingComponent, this.#container);
   }
 
+  #renderLoadingError() {
+    this.#loadingErrorComponent = new LoadingErrorView();
+    render(this.#loadingErrorComponent, this.#container);
+    remove(this.#loadingComponent);
+  }
+
   #render() {
     if (this.#isLoading) {
       this.#renderLoading();
+      return;
+    }
+
+    if (this.#isLoadingError) {
+      this.#renderLoadingError();
       return;
     }
 
@@ -134,6 +157,7 @@ export default class ListPresenter {
     this.#clearEvents();
 
     remove(this.#emptyListComponent);
+    remove(this.#loadingErrorComponent);
     remove(this.#eventListComponent);
     remove(this.#sortComponent);
 
@@ -185,24 +209,50 @@ export default class ListPresenter {
         break;
       case UpdateType.INIT:
         this.#isLoading = false;
+        this.#isLoadingError = false;
+        remove(this.#loadingComponent);
+        this.#render();
+        break;
+      case UpdateType.ERROR:
+        this.#isLoading = false;
+        this.#isLoadingError = true;
         remove(this.#loadingComponent);
         this.#render();
         break;
     }
   };
 
-  #handleViewAction = (actionType, updateType, update) => {
-    switch (actionType) {
-      case UserAction.UPDATE_EVENT:
-        this.#eventsModel.updateEvent(updateType, update);
-        break;
-      case UserAction.ADD_EVENT:
-        this.#eventsModel.addEvent(updateType, update);
-        break;
-      case UserAction.DELETE_EVENT:
-        this.#eventsModel.deleteEvent(updateType, update);
-        break;
-
+  #handleViewAction = async (actionType, updateType, update) => {
+    this.#uiBlocker.block();
+    try {
+      switch (actionType) {
+        case UserAction.UPDATE_EVENT:
+          this.#eventPresenters.get(update.id).setSaving();
+          try {
+            await this.#eventsModel.updateEvent(updateType, update);
+          } catch (err) {
+            this.#eventPresenters.get(update.id).setAborting();
+          }
+          break;
+        case UserAction.ADD_EVENT:
+          this.#newEventPresenter.setSaving();
+          try {
+            await this.#eventsModel.addEvent(updateType, update);
+          } catch (err) {
+            this.#newEventPresenter.setAborting();
+          }
+          break;
+        case UserAction.DELETE_EVENT:
+          this.#eventPresenters.get(update.id).setDeleting();
+          try {
+            await this.#eventsModel.deleteEvent(updateType, update);
+          } catch (err) {
+            this.#eventPresenters.get(update.id).setAborting();
+          }
+          break;
+      }
+    } finally {
+      this.#uiBlocker.unblock();
     }
   };
 }
