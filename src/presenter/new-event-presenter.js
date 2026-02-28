@@ -1,6 +1,5 @@
 import { ESC_KEY, UpdateType, UserAction } from '../constants/const.js';
 import { remove, render, RenderPosition } from '../framework/render.js';
-import { nanoid } from 'nanoid';
 import CreateFormView from '../view/create-form-view/create-form-view.js';
 
 export default class NewEventPresenter {
@@ -18,10 +17,7 @@ export default class NewEventPresenter {
   }
 
   init() {
-    if (this.#eventCreateView !== null) {
-      return;
-    }
-
+    console.log(this.#eventListContainer)
     this.#eventCreateView = new CreateFormView({
       onSubmit: this.#handleFormSubmit,
       onClose: this.#handleCancelClick,
@@ -29,6 +25,10 @@ export default class NewEventPresenter {
       allOffers: this.#eventsModel.offers,
       offersTypes: this.#eventsModel.getOffersTypes(),
     });
+
+    console.log("INIT")
+    console.log(this.#eventCreateView)
+    console.log(this.#eventListContainer)
 
     render(this.#eventCreateView, this.#eventListContainer, RenderPosition.AFTERBEGIN);
     document.addEventListener('keydown', this.#escKeyDownHandler);
@@ -47,17 +47,49 @@ export default class NewEventPresenter {
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   }
 
+  setSaving() {
+    if (this.#eventCreateView) {
+      this.#eventCreateView.updateElement({
+        isDisable: true,
+        isSaving: true,
+        isDeleting: true
+      });
+    }
+  }
+
+  setAborting() {
+    console.log('setAborting called', this.#eventCreateView);
+    console.log('shake method exists:', typeof this.#eventCreateView.shake === 'function');
+    const resetFormState = () => {
+      this.#eventCreateView.updateElement({
+        isDisable: false,
+        isSaving: false,
+        isDeleting: false
+      });
+    };
+    try {
+      this.#eventCreateView.shake(resetFormState);
+      console.log('shake method called successfully');
+    } catch (error) {
+      console.error('Error calling shake:', error);
+    }
+  }
+
   #handleCancelClick = () => {
     this.destroy();
   };
 
-  #handleFormSubmit = (event) => {
-    this.#handleDataChange(
-      UserAction.ADD_EVENT,
-      UpdateType.MINOR,
-      {id: nanoid(), ...event},
-    );
-    this.destroy();
+  #handleFormSubmit = async (event) => {
+    try {
+      await this.#handleDataChange(
+        UserAction.ADD_EVENT,
+        UpdateType.MINOR,
+        event
+      );
+      this.destroy();
+    } catch (error) {
+      throw error;
+    }
   };
 
   #escKeyDownHandler = (evt) => {

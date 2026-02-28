@@ -37,8 +37,18 @@ export default class EditFormView extends AbstractStatefulView{
     return createFormEditTemplate(this._state, this.#allСities, this.#offersTypes);
   }
 
+  get _isFormValid() {
+    const isDestinationSelected = this._state.destination && this._state.destination !== '';
+    const isDatesValid = this._state.dateFrom && this._state.dateTo;
+    const isPriceValid = this._state.basePrice > 0;
+
+    return isDestinationSelected && isDatesValid && isPriceValid;
+  }
+
   reset() {
-    this.updateElement(this.#originalState);
+    this._setState(this.#originalState);
+    console.log('state', this._state)
+    this.#updateSaveButton();
   }
 
   _restoreHandlers() {
@@ -63,20 +73,22 @@ export default class EditFormView extends AbstractStatefulView{
       checkbox.addEventListener('change', this.#offerChangeHandler);
     });
 
-    this.#updateSaveButtonState();
+    this.#updateSaveButton();
     this.#setDatepickers();
   }
+
+  #updateSaveButton = () => {
+    const saveButton = this.element?.querySelector('.event__save-btn');
+
+    if (saveButton) {
+      const isDisabled = !this._isFormValid || this._state.isSaving || this._state.isDisable;
+      saveButton.disabled = isDisabled;
+    }
+  };
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
     this.#handleFormSubmit(EditFormView.parseStateToEvent(this._state));
-  };
-
-  #updateSaveButtonState = () => {
-    const saveButton = this.element.querySelector('.event__save-btn');
-    if (saveButton) {
-      saveButton.disabled = !this._state.isDestinationValid;
-    }
   };
 
   #editRollUpHandler = (evt) => {
@@ -99,6 +111,7 @@ export default class EditFormView extends AbstractStatefulView{
       : this._state.offers.filter((id) => id !== offerId);
 
     this._setState({ offers: updatedOffers });
+    this.#updateSaveButton();
   };
 
   #typeListChangeHandler = (evt) => {
@@ -106,60 +119,75 @@ export default class EditFormView extends AbstractStatefulView{
     const targetType = evt.target.value;
     const typeOffers = this.#allOffers.find((item) => item.type === targetType);
 
-    this.updateElement({
+    this._setState({
       type: targetType,
       allOffersType: typeOffers?.offers || [],
       offers: []
     });
+    this.#updateSaveButton();
   };
-
 
   #destinationChangeHandler = (evt) => {
     const inputValue = evt.target.value;
     const newDestination = this.#allDestinations.find((item) => item.name === inputValue);
 
     if (newDestination) {
-      this.updateElement({
+      this._setState({
         destination: newDestination.id,
         destinationById: newDestination,
-        isDestinationValid: true
       });
+      this.#updateSaveButton();
       return;
     }
 
-    this.updateElement({
+    this._setState({
       destination: null,
       destinationById: {
         name: inputValue,
         description: '',
         pictures: []
       },
-      isDestinationValid: false
     });
-
+    this.#updateSaveButton();
   };
 
   #priceChangeHandler = (evt) => {
     const input = evt.target;
     input.value = input.value.replace(/[^\d]/g, '');
-    this._setState({ basePrice: Number(input.value) || 0 });
+    this._setState({ basePrice: Number(input.value) });
+    this.#updateSaveButton();
   };
 
   #dateFromChangeHandler = ([userDate]) => {
-    this.updateElement({
+    this._setState({
       dateFrom: userDate,
     });
+    this.#updateSaveButton();
+
+    if (this.#datepickerTo) {
+      this.#datepickerTo.set('minDate', userDate);
+    }
   };
 
   #dateToChangeHandler = ([userDate]) => {
-    this.updateElement({
+    this._setState({
       dateTo: userDate,
     });
+    this.#updateSaveButton();
+
+    if (this.#datepickerFrom) {
+      this.#datepickerFrom.set('maxDate', userDate);
+    }
   };
 
   #setDatepickers() {
-    const fromDateStr = dayjs.utc(this._state.dateFrom).format(DateFormat.FULL_DATE_FORMAT);
-    const toDateStr = dayjs.utc(this._state.dateTo).format(DateFormat.FULL_DATE_FORMAT);
+    const fromInput = this.element.querySelector('#event-start-time-1');
+    const toInput = this.element.querySelector('#event-end-time-1');
+
+    fromInput.value = this._state.dateFrom ?
+      dayjs(this._state.dateFrom).format(DateFormat.FULL_DATE_FORMAT) : '';
+    toInput.value = this._state.dateTo ?
+      dayjs(this._state.dateTo).format(DateFormat.FULL_DATE_FORMAT) : '';
 
     this.#datepickerFrom = flatpickr(
       this.element.querySelector('#event-start-time-1'),
@@ -167,21 +195,20 @@ export default class EditFormView extends AbstractStatefulView{
         dateFormat: DateFormat.FLATPICKR_FORMAT,
         enableTime: true,
         'time_24hr': true,
-        defaultDate: fromDateStr,
+        defaultDate: this._state.dateFrom,
         onChange: this.#dateFromChangeHandler,
-        maxDate: toDateStr,
+        maxDate: this._state.dateTo || null,
       }
     );
-
     this.#datepickerTo = flatpickr(
       this.element.querySelector('#event-end-time-1'),
       {
         dateFormat: DateFormat.FLATPICKR_FORMAT,
         enableTime: true,
         'time_24hr': true,
-        defaultDate: toDateStr,
         onChange: this.#dateToChangeHandler,
-        minDate: fromDateStr,
+        defaultDate: this._state.dateTo,
+        minDate: this._state.dateFrom || null,
       }
     );
   }
@@ -211,7 +238,9 @@ export default class EditFormView extends AbstractStatefulView{
       destinationById,
       destination: event.destination,
       allOffersType: offersByType,
-      isDestinationValid: true
+      isDisable:false,
+      isSaving:false,
+      isDeleting:false
     };
   }
 
@@ -219,7 +248,9 @@ export default class EditFormView extends AbstractStatefulView{
     const event = {...state};
     delete event.allOffersType;
     delete event.destinationById;
-    delete event.isDestinationValid;
+    delete event.isDisable;
+    delete event.isSaving;
+    delete event.isDeleting;
 
     return event;
   }

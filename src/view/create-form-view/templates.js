@@ -2,17 +2,47 @@ import { DateFormat } from '../../constants/const';
 import { humanizePointDueDate } from '../../utils/formatter';
 import he from 'he';
 
-export function createFormCreateTemplate(state, allDestinations, allOffers, offersTypes) {
-  const { type, offers, destination, basePrice, dateFrom, dateTo, destinationById = {} } = state;
+function createOffersItemTemplate(offer, selectedOffers, isDisabled) {
+  const isChecked = selectedOffers.some((selectedOffer) => selectedOffer.id === offer.id);
 
-  const cityData = destination
-    ? allDestinations.find((item) => item.id === destination)
-    : destinationById;
+  return `<div class="event__offer-selector">
+    <input class="event__offer-checkbox visually-hidden"
+      id="event-offer-${offer.id}"
+      type="checkbox"
+      name="event-offer-${offer.id}"
+      ${isChecked ? 'checked' : ''}
+      ${isDisabled ? 'disabled' : ''}
+    >
+    <label class="event__offer-label" for="event-offer-${offer.id}">
+      <span class="event__offer-title">${offer.title}</span>
+      &plus;&euro;&nbsp;
+      <span class="event__offer-price">${offer.price}</span>
+    </label>
+  </div>`;
+}
+
+export function createFormCreateTemplate(state, allDestinations, allOffers, offersTypes) {
+  const {
+    type,
+    offers,
+    basePrice,
+    dateFrom,
+    dateTo,
+    destinationById = {},
+    isDisable,
+    isSaving,
+    isDeleting
+  } = state;
+
+  const cityData = destinationById;
   const { name = '', description = '', pictures = [] } = cityData || {};
   const typeOffers = allOffers.find((item) => item.type === type)?.offers || [];
-
   const startDay = humanizePointDueDate(dateFrom, DateFormat.FULL_DATE_FORMAT);
   const endDay = humanizePointDueDate(dateTo, DateFormat.FULL_DATE_FORMAT);
+
+
+  const saveButtonText = isSaving ? 'Saving...' : 'Save';
+  const isResetButtonDisabled = isDisable || isDeleting;
 
   return `<form class="event event--edit" action="#" method="post">
     <header class="event__header">
@@ -24,7 +54,7 @@ export function createFormCreateTemplate(state, allDestinations, allOffers, offe
         <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
         <div class="event__type-list">
-          <fieldset class="event__type-group">
+          <fieldset class="event__type-group" ${isDisable ? 'disabled' : ''}>
             <legend class="visually-hidden">Event type</legend>
             ${offersTypes.map((typeOption) => `
             <div class="event__type-item">
@@ -33,7 +63,8 @@ export function createFormCreateTemplate(state, allDestinations, allOffers, offe
                 type="radio"
                 name="event-type"
                 value="${typeOption}"
-                ${typeOption === type ? 'checked' : ''}>
+                ${typeOption === type ? 'checked' : ''}
+                ${isDisable ? 'disabled' : ''}>
               <label class="event__type-label event__type-label--${typeOption}"
                 for="event-type-${typeOption}-1">
                 ${typeOption.charAt(0).toUpperCase() + typeOption.slice(1)}
@@ -53,7 +84,8 @@ export function createFormCreateTemplate(state, allDestinations, allOffers, offe
           type="text"
           name="event-destination"
           value="${he.encode(name)}"
-          list="destination-list-1">
+          list="destination-list-1"
+          ${isDisable ? 'disabled' : ''}>
         <datalist id="destination-list-1">
           ${allDestinations.map((dest) => `<option value="${dest.name}"></option>`).join('')}
         </datalist>
@@ -65,14 +97,16 @@ export function createFormCreateTemplate(state, allDestinations, allOffers, offe
                id="event-start-time-1"
                type="text"
                name="event-start-time"
-               value="${startDay}">
+               value="${startDay}"
+               ${isDisable ? 'disabled' : ''}>
         &mdash;
         <label class="visually-hidden" for="event-end-time-1">To</label>
         <input class="event__input event__input--time"
                id="event-end-time-1"
                type="text"
                name="event-end-time"
-               value="${endDay}">
+               value="${endDay}"
+               ${isDisable ? 'disabled' : ''}>
       </div>
 
       <div class="event__field-group event__field-group--price">
@@ -84,11 +118,20 @@ export function createFormCreateTemplate(state, allDestinations, allOffers, offe
           id="event-price-1"
           type="text"
           name="event-price"
-          value="${basePrice}">
+          value="${basePrice}"
+          ${isDisable ? 'disabled' : ''}>
       </div>
 
-      <button class="event__save-btn btn btn--blue" type="submit">Save</button>
-      <button class="event__reset-btn" type="reset">Cancel</button>
+      <button class="event__save-btn btn btn--blue"
+        type="submit">
+        ${saveButtonText}
+      </button>
+
+      <button class="event__reset-btn"
+        type="reset" \
+        ${isResetButtonDisabled ? 'disabled' : ''}>
+        Cancel
+      </button>
     </header>
 
     <section class="event__details">
@@ -96,21 +139,9 @@ export function createFormCreateTemplate(state, allDestinations, allOffers, offe
         <section class="event__section event__section--offers">
           <h3 class="event__section-title event__section-title--offers">Offers</h3>
           <div class="event__available-offers">
-            ${typeOffers.map((offerItem) => `
-              <div class="event__offer-selector">
-                <input class="event__offer-checkbox visually-hidden"
-                  id="event-offer-${offerItem.id}"
-                  type="checkbox"
-                  name="event-offer-${offerItem.id}"
-                  ${offers.some((offer) => offer.id === offerItem.id) ? 'checked' : ''}
-                >
-                <label class="event__offer-label" for="event-offer-${offerItem.id}">
-                  <span class="event__offer-title">${offerItem.title}</span>
-                  &plus;&euro;&nbsp;
-                  <span class="event__offer-price">${offerItem.price}</span>
-                </label>
-              </div>
-            `).join('')}
+            ${typeOffers.map((offerItem) =>
+              createOffersItemTemplate(offerItem, offers, isDisable)
+            ).join('')}
           </div>
         </section>
       ` : ''}

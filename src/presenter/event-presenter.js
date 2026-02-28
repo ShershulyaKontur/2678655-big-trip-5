@@ -79,39 +79,87 @@ export default class EventPresenter {
     }
   }
 
-  #handleFavoriteClick() {
-    this.#handleEventChange(
-      UserAction.UPDATE_EVENT,
-      UpdateType.PATCH,
-      {...this.#event
-        , isFavorite: !this.#event.isFavorite}
-    );
+  setSaving(){
+    if (this.#modeView === Mode.EDITING){
+      this.#eventEditForm.updateElement({
+        isDisable: true,
+        isSaving: true
+      })
+    }
   }
 
-  #handleDeleteClick(event) {
-    this.#handleEventChange(
-      UserAction.DELETE_EVENT,
-      UpdateType.MINOR,
-      event
-    );
+  setDeleting(){
+    if (this.#modeView === Mode.EDITING){
+      this.#eventEditForm.updateElement({
+        isDisable: true,
+        isDeleting: true
+      })
+    }
   }
 
+  setAborting(){
+    if (this.#modeView === Mode.DEFAULT){
 
-  #handleFormSubmit(update) {
+      this.#eventComponent.shake();
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#eventEditForm.updateElement({
+        isDisable: false,
+        isDeleting: false,
+        isSaving: false
+      });
+    };
+
+    this.#eventEditForm.shake(resetFormState);
+  }
+
+  #handleFavoriteClick = async () => {
+    try {
+      await this.#handleEventChange(
+        UserAction.UPDATE_EVENT,
+        UpdateType.PATCH,
+        {...this.#event, isFavorite: !this.#event.isFavorite}
+      );
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  #handleDeleteClick = async (event) => {
+    try {
+      await this.#handleEventChange(
+        UserAction.DELETE_EVENT,
+        UpdateType.MINOR,
+        event
+      );
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  #handleFormSubmit = async (event) => {
     const isMinorUpdate =
-      !isDatesEqual(this.#event.dateFrom, update.dateFrom) ||
-      !isDatesEqual(this.#event.dateTo, update.dateTo) ||
-      this.#event.basePrice !== update.basePrice ||
-      this.#event.destination !== update.destination ||
-      this.#event.type !== update.type;
+      !isDatesEqual(this.#event.dateFrom, event.dateFrom) ||
+      !isDatesEqual(this.#event.dateTo, event.dateTo) ||
+      this.#event.basePrice !== event.basePrice ||
+      this.#event.destination !== event.destination
+    console.log(isMinorUpdate)
 
-    this.#handleEventChange(
-      UserAction.UPDATE_EVENT,
-      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
-      update
-    );
-    this.#replaceFormToEvent();
-  }
+    try {
+      await this.#handleEventChange(
+        UserAction.UPDATE_EVENT,
+        isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+        event
+      );
+      if(!isMinorUpdate){
+        this.#replaceFormToEvent();
+      }
+    } catch (error) {
+      throw error;
+    }
+  };
 
   #escKeyDownHandler = (evt) => {
     if (evt.key === ESC_KEY) {
@@ -138,9 +186,10 @@ export default class EventPresenter {
   }
 
   #replaceFormToEvent() {
+    console.log(this.#eventComponent)
+    console.log(this.#eventEditForm)
     replace(this.#eventComponent, this.#eventEditForm);
     document.removeEventListener('keydown', this.#escKeyDownHandler);
     this.#modeView = Mode.DEFAULT;
   }
-
 }

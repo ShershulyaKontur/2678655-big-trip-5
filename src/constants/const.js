@@ -15,6 +15,13 @@ export const UpdateType = {
 export const Method = {
   GET: 'GET',
   PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE',
+};
+
+export const TimeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
 };
 
 export const UserAction = {
@@ -33,19 +40,17 @@ export const DateFormat = {
 };
 
 export const DurationThresholds = {
-  HOUR: 60 * 60 * 1000,
   DAY: 24 * 60 * 60 * 1000,
-  MINUTE: 60 * 1000,
   MINUTES_IN_DAY: 24 * 60,
   MINUTES_IN_HOUR: 60
 };
 
 export const DEFAULT_CREATE_STATE = {
   type: 'flight',
-  basePrice: '1111',
-  dateFrom: '2026-02-23T10:24:00Z',
-  dateTo: '2026-02-23T11:24:00Z',
-  destination: 3,
-  offers: [10, 11, 12]
+  basePrice: '0',
+  dateFrom: '',
+  dateTo: '',
+  destination: '',
+  offers: []
 };
 
