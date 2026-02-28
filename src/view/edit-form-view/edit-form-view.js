@@ -46,7 +46,7 @@ export default class EditFormView extends AbstractStatefulView{
   }
 
   reset() {
-    this._setState(this.#originalState);
+    this.updateElement(this.#originalState);
     console.log('state', this._state)
     this.#updateSaveButton();
   }
